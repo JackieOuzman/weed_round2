@@ -36,3 +36,13 @@ HR_weed_list_long <- pivot_longer(HR_weed_list,
                                   names_to = "weed",
                                   values_to="weed_class"
                                   )
+################################################################################
+###    what have the top weeds for each AEZ ########
+################################################################################
+unique(HR_weed_list$`GRDC AEZ`)
+str(HR_weed_list_long)
+
+HR_weed_list_long %>% filter %>% `GRDC AEZ` == "NSW NW Qld SW" %>% 
+  filter %>% is.na(weed_class)
+
+`NSW NW Qld SW`
