@@ -122,19 +122,19 @@ str(AEZ_weeds)
 
 AEZ_weeds <- AEZ_weeds %>% arrange(AEZ, Year) %>%
   group_by(AEZ, Year) %>%
-  mutate(rank = rank(perecent_occurance))
+  mutate(rank = rank(percent_occurance))
  
 #https://www.r-bloggers.com/2022/07/how-to-rank-by-group-in-r/
 # This has some tip on dealing with ties - I have not implemented this yet.
 
 AEZ_weed1 <- AEZ_weeds %>%
   group_by(AEZ, Year) %>%
-  filter(perecent_occurance == max(perecent_occurance, na.rm=TRUE))
+  filter(percent_occurance == max(percent_occurance, na.rm=TRUE))
 AEZ_weed1 <- ungroup(AEZ_weed1)
 
 AEZ_weed1 <-AEZ_weed1 %>% rename (weed1 = weed,
                                   count_weed1 = count,
-                                  perecent_occurance_weed1 = perecent_occurance,
+                                  perecent_occurance_weed1 = percent_occurance,
                                   rank_weed1 = rank) %>% 
   select (-tally)
 
@@ -149,13 +149,13 @@ str(AEZ_weed1)
 
 AEZ_weed2 <- AEZ_weeds %>%
   group_by(AEZ, Year) %>%
-  filter(perecent_occurance == max(perecent_occurance[perecent_occurance != max(perecent_occurance)]))
+  filter(percent_occurance == max(percent_occurance[percent_occurance != max(percent_occurance)]))
 
 AEZ_weed2 <- ungroup(AEZ_weed2)
 str(AEZ_weed2)
 AEZ_weed2 <-AEZ_weed2 %>% rename (weed2 = weed,
                                   count_weed2 = count,
-                                  perecent_occurance_weed2 = perecent_occurance,
+                                  perecent_occurance_weed2 = percent_occurance,
                                   rank_weed2 = rank) %>% 
   select (-tally)
 
