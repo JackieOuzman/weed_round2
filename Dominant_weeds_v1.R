@@ -1,22 +1,9 @@
-library(MESS)
+
 library(tidyverse)
 library(readxl)
 library(dplyr)
-#install.packages("PerformanceAnalytics")
-library("PerformanceAnalytics")
-library("Hmisc")
 library(ggplot2)
-
 library(plotly)
-
-
-library(hrbrthemes)
-library(viridis)
-library(forcats)
-library(hrbrthemes)
-library(stringr)
-#install.packages("hrbrthemes")
-
 library(ggpubr)
 
 
@@ -49,48 +36,147 @@ HR_weed_list_long <-HR_weed_list_long %>%
       weed_class =="L" ~ "2",
       weed_class =="M" ~ "3",
       weed_class =="H" ~ "4",
+      weed_class =="VH" ~ "5",
       TRUE ~ weed_class
     )
   )
 
-################################################################################
-###    what have the top weeds for each AEZ ########
-################################################################################
-unique(HR_weed_list$AEZ)
-str(HR_weed_list_long)
 
+## remove all the rows with missing weeds
+HR_weed_list_long_remove_na <- HR_weed_list_long %>% filter(!is.na(weed_class))
 
 ################################################################################
 ### make a list of weeds per zone
+str(HR_weed_list_long_remove_na)
 
-list_of_weed_AEZ1 <- HR_weed_list_long %>% 
-  filter(AEZ == "NSW NW Qld SW") %>% 
-  filter(!is.na(weed_class)) %>% 
+list_of_weed_AEZ <- HR_weed_list_long_remove_na %>% 
+  group_by(AEZ) %>% 
   distinct(weed, .keep_all = TRUE) %>% 
-  dplyr::select(AEZ, weed) %>% 
-  arrange(weed )
+  select(AEZ, weed)
+  
+list_of_weed_AEZ <- ungroup(list_of_weed_AEZ)
+str(list_of_weed_AEZ)
+
+write.csv(list_of_weed_AEZ, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/list_of_weed_AEZ.csv", row.names = FALSE)
+
+################################################################################
+## how many weeds per zone
+list_of_weed_AEZ_count <- list_of_weed_AEZ %>% count(AEZ)
+str(list_of_weed_AEZ_count)
+
+list_of_weed_AEZ_count <- list_of_weed_AEZ_count %>% rename(`Number of weeds ID` = n)
+write.csv(list_of_weed_AEZ_count, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/list_of_weed_AEZ_count.csv", row.names = FALSE)
 
 
 ################################################################################
-### 37 weeds in zone 1 ### this is probably not what I want
+## how many paddocks per zone
+str(HR_weed_list_long_remove_na)
+paddock_per_AEZ_year <- HR_weed_list_long_remove_na %>%  count(Sample, AEZ, Year) #nope this is not what I want
 
-#3 corner Jack
+paddock_per_AEZ_year <- paddock_per_AEZ_year %>% 
+  group_by(AEZ, Year) %>% 
+  count(AEZ)
+paddock_per_AEZ_year <- ungroup(paddock_per_AEZ_year)
+str(paddock_per_AEZ_year)
+paddock_per_AEZ_year <- paddock_per_AEZ_year %>%  rename(`count of paddocks` = n)
+
+paddock_per_AEZ_year
+
+################################################################################
+#count the number of weed occurrence per AEZ, weed and year  
+AEZ_weeds_count <- HR_weed_list_long_remove_na %>% count(AEZ, weed, Year, sort = TRUE)    
+AEZ_weeds_count <- AEZ_weeds_count %>%  arrange(AEZ, weed, Year)
+str(AEZ_weeds_count) 
+AEZ_weeds_count <- AEZ_weeds_count %>%  rename(count = n)
+
+#count the number of paddocks sampled per AEZ and year (from above)
+paddock_per_AEZ_year
+
+################################################################################
+#### join the summary data together
+AEZ_weeds <- left_join(AEZ_weeds_count,paddock_per_AEZ_year)
+## add a percent 
+
+str(AEZ_weeds)
+AEZ_weeds <- AEZ_weeds %>% mutate(percent_occurance = (count/`count of paddocks`)*100) 
+AEZ_weeds$percent_occurance <- round(AEZ_weeds$percent_occurance, 2)
+
+AEZ_weeds
+
+################################################################################
+## add a rank ## ranks without averaging # first occurrence wins
+str(AEZ_weeds)
+
+AEZ_weeds <- AEZ_weeds %>% arrange(AEZ, Year) %>%
+  group_by(AEZ, Year) %>%
+  mutate(rank = rank(-percent_occurance, ties.method= "first"))
+
+test <- AEZ_weeds %>% filter(Year == 2013) %>% 
+  filter(AEZ == "NSW NE Qld SE") %>% 
+  arrange(AEZ, Year) %>%
+  mutate(rank = rank(-percent_occurance, ties.method= "first"))
+
+################################################################################
+# keep the top 4 weeds in each AEZ and year
+
+top4weeds <- AEZ_weeds %>% 
+  group_by(AEZ, Year) %>%
+  top_n(-4, rank)
+
+str(top4weeds)
+top4weeds <- ungroup(top4weeds)
+
+top4weeds <- top4weeds %>%  select(AEZ, Year, weed, percent_occurance, rank)
 
 
-AEZ1_3corner_Jack <- HR_weed_list_long %>% 
-  filter(AEZ == "NSW NW Qld SW") %>% 
-  filter(weed  == "3 corner Jack") %>% 
-  filter(!is.na(weed_class)) %>% 
-  distinct(weed, .keep_all = TRUE) %>% 
-  arrange(Year, weed_class )
+top4weeds$percent_occurance <- round(top4weeds$percent_occurance, 0)
 
 
-AEZ1_African_turnip_weed <- HR_weed_list_long %>% 
-  filter(AEZ == "NSW NW Qld SW") %>% 
-  filter(weed  == "African turnip weed") %>% 
-  filter(!is.na(weed_class)) %>% 
-  distinct(weed, .keep_all = TRUE) %>% 
-  arrange(Year, weed_class )
+
+
+top4weeds <- top4weeds %>% arrange(AEZ, Year, rank)
+
+
+
+
+
+
+#### Up to here I have list of weed and rank and % of paddocks
+
+### now add in the densities and number of species per paddock plots
+## Think about how I can display this which is not a table?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ################################################################################
