@@ -130,13 +130,179 @@ top4weeds <- top4weeds %>%  select(AEZ, Year, weed, percent_occurance, rank)
 
 
 top4weeds$percent_occurance <- round(top4weeds$percent_occurance, 0)
-
-
-
-
 top4weeds <- top4weeds %>% arrange(AEZ, Year, rank)
 
 
+
+
+
+
+################################################################################
+#Addd ranking to the long list of weeds
+
+rank1_2 <- top4weeds %>% filter(rank == 1 | rank==2) 
+rank <- left_join(HR_weed_list_long_remove_na, rank1_2)
+## remove all the rows with missing weeds
+rank <- rank %>% filter(!is.na(rank))
+str(rank)
+unique(rank$weed_class)
+
+rank$weed_class <- as.factor(rank$weed_class)
+levels(rank$weed_class)
+rank$weed_class <- factor(rank$weed_class, levels=c("VL", "L", "M", "H", "VH"))
+
+label_weed1 <- rank %>% 
+  filter(rank == 1) %>% 
+  distinct(Year,AEZ, .keep_all = TRUE)
+
+label_weed2 <- rank %>% 
+  filter(rank == 2) %>% 
+  distinct(Year,AEZ, .keep_all = TRUE)
+
+
+### Plot of weed 1 and 2
+rank %>% 
+ filter(rank == 1) %>% 
+ggplot(aes(as.factor(Year),  weed_class))+
+  geom_jitter(aes(colour = weed_class), position=position_jitter(0.2))+
+   facet_wrap(.~AEZ)+
+   geom_text(data=label_weed1, mapping = aes(label=stringr::str_wrap(weed,4),y="VH",x=as.factor(Year)), angle = 90, size =3, colour= "black")+
+   theme_bw()+ 
+   labs(title = "Most common weed by AEZ and Year",
+        subtitle = "Rank weed 1",
+        caption = "Using: Weed Species locations no co-ordinates.xlsx",
+        x = "Year",  
+       y ="Weed Class")+
+   theme(legend.position = "none")+
+   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+rank %>% 
+  filter(rank == 2) %>% 
+  ggplot(aes(as.factor(Year),  weed_class))+
+  geom_jitter(aes(colour = weed_class), position=position_jitter(0.2))+
+  facet_wrap(.~AEZ)+
+  geom_text(data=label_weed2, mapping = aes(label=stringr::str_wrap(weed,4),y="VH",x=as.factor(Year)), angle = 90, size =3, colour= "black")+
+  theme_bw()+ 
+  labs(title = "Most common weed by AEZ and Year",
+       subtitle = "Rank weed 2",
+       caption = "Using: Weed Species locations no co-ordinates.xlsx",
+       x = "Year",  
+       y ="Weed Class")+
+  theme(legend.position = "none")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+##################################################################################
+
+###summaries the weed class   
+str(rank)
+
+rank$weed_class_code <- as.double(rank$weed_class_code)
+#I need a function to cal mode!
+mode <- function(codes){
+  which.max(tabulate(codes))
+}
+
+rank_AEZ_weed_densities <- rank %>% 
+  group_by(weed, AEZ, Year, rank) %>% 
+  summarise(
+    mode =mode(weed_class_code),
+    median = median(weed_class_code, na.rm = TRUE)
+  ) %>% 
+  arrange(AEZ, rank, Year )
+
+
+################################################################################
+str(rank_AEZ_weed_densities)
+rank_AEZ_weed_densities <- ungroup(rank_AEZ_weed_densities)
+
+### add the mode and median back into the rank data 
+rank_density_mode <- left_join(rank, rank_AEZ_weed_densities)
+
+rank_density_mode_display_weed1 <- rank_density_mode %>% 
+  filter(rank == 1) %>% 
+  distinct(Year,AEZ, .keep_all = TRUE) %>% select(Year,AEZ, mode)
+rank_density_mode_display_weed2 <- rank_density_mode %>% 
+  filter(rank == 2) %>% 
+  distinct(Year,AEZ, .keep_all = TRUE) %>% select(Year,AEZ, mode)
+
+### recode mode.
+
+## recode weed class with an number
+rank_density_mode_display_weed1 <-rank_density_mode_display_weed1 %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    )
+  )
+
+rank_density_mode_display_weed2 <-rank_density_mode_display_weed2 %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    )
+  )
+#turn it into a factor so it displays better
+rank_density_mode_display_weed1$weed_class_Mode <- as.factor(rank_density_mode_display_weed1$weed_class_Mode)
+levels(rank_density_mode_display_weed1$weed_class_Mode)
+rank_density_mode_display_weed1$weed_class_Mode <- factor(rank_density_mode_display_weed1$weed_class_Mode, levels=c("VL", "L", "M", "H", "VH"))
+
+rank_density_mode_display_weed2$weed_class_Mode <- as.factor(rank_density_mode_display_weed2$weed_class_Mode)
+levels(rank_density_mode_display_weed2$weed_class_Mode)
+rank_density_mode_display_weed2$weed_class_Mode <- factor(rank_density_mode_display_weed2$weed_class_Mode, levels=c("VL", "L", "M", "H", "VH"))
+
+### Plot of weed 1 and 2
+rank1_plot <- rank_density_mode %>% 
+  filter(rank == 1) %>% 
+  ggplot(aes(as.factor(Year),  weed_class))+
+  #geom_point(data = rank_density_mode_display_weed1, aes(as.factor(Year),  weed_class_Mode))+
+  geom_jitter(aes(colour = weed_class), position=position_jitter(0.2))+
+  facet_wrap(.~AEZ)+
+  geom_text(data=label_weed1, mapping = aes(label=stringr::str_wrap(weed,4),y="VH",x=as.factor(Year)), angle = 90, size =3, colour= "black")+
+  theme_bw()+ 
+  labs(title = "Most common weed by AEZ and Year",
+       subtitle = "Rank weed 1, mode of densisty in black",
+       caption = "Using: Weed Species locations no co-ordinates.xlsx",
+       x = "Year",  
+       y ="Weed Class")+
+  theme(legend.position = "none")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  
+### Add the mode data
+rank1_plot + geom_point(data = rank_density_mode_display_weed1, aes(as.factor(Year),  weed_class_Mode))
+
+  
+ 
+
+### Plot of weed 1 and 2
+rank2_plot <- rank_density_mode %>% 
+  filter(rank == 2) %>% 
+  ggplot(aes(as.factor(Year),  weed_class))+
+  #geom_point(data = rank_density_mode_display_weed1, aes(as.factor(Year),  weed_class_Mode))+
+  geom_jitter(aes(colour = weed_class), position=position_jitter(0.2))+
+  facet_wrap(.~AEZ)+
+  geom_text(data=label_weed2, mapping = aes(label=stringr::str_wrap(weed,4),y="VH",x=as.factor(Year)), angle = 90, size =3, colour= "black")+
+  theme_bw()+ 
+  labs(title = "Most common weed by AEZ and Year",
+       subtitle = "Rank weed 2, mode of densisty in black",
+       caption = "Using: Weed Species locations no co-ordinates.xlsx",
+       x = "Year",  
+       y ="Weed Class")+
+  theme(legend.position = "none")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+### Add the mode data
+rank2_plot + geom_point(data = rank_density_mode_display_weed2, aes(as.factor(Year),  weed_class_Mode))
 
 
 
