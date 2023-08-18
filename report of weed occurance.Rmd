@@ -1,5 +1,5 @@
 ---
-title: "Dominant weeds"
+title: "Dominant weeds in VIC AEZ"
 author: "Jackie"
 date: "2023-08-16"
 output: html_document
@@ -106,6 +106,22 @@ paddock_per_AEZ_year <- paddock_per_AEZ_year %>%  rename(`count of paddocks` = n
 
 
 paddock_per_AEZ_year
+
+paddock_per_AEZ_year %>% 
+  ggplot(aes(as.factor(Year),  `count of paddocks`, group=AEZ, color = AEZ))+
+  geom_point()+
+   theme_bw()+ 
+   labs(title = "Number of paddock by AEZ and Year",
+        x = "Year",  
+        y ="Number of paddocks smapled")
+ggsave(
+  device = "png",
+  filename = "Number of paddock.png",
+  path= "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+) 
 
 ```
 
@@ -518,4 +534,49 @@ datatable(DT_Rank1_test,  caption = 'Rank 1: Most common weed per AEZ and year.'
 
 datatable(DT_Rank2_test,  caption = 'Rank 2: 2nd Most common weed per AEZ and year.')
 
+```
+
+
+
+## Number of weed species per paddock
+
+```{r Number of weed species per paddock, echo=FALSE, message=FALSE, warning=FALSE}
+
+Number_weeds_per_paddock <- HR_weed_list_long_remove_na %>% 
+  group_by(Sample, Year) %>% 
+  summarise(n = n())
+
+Number_weeds_per_paddock <-Number_weeds_per_paddock %>% rename(count_weeds = n )
+Number_weeds_per_paddock$count_weeds <- as.factor(Number_weeds_per_paddock$count_weeds)
+
+ggplot(data = Number_weeds_per_paddock, aes(x = count_weeds)) +
+  geom_histogram(aes(
+    x = count_weeds,
+    y = (..count.. / sum(..count..)) * 100),
+    #fill = ..x..  ),
+  stat = 'count',
+  show.legend = FALSE) +
+  scale_x_discrete(drop = FALSE) +
+  labs(x = 'Number of weed species per paddock', 
+       y = 'Percent', 
+       title = "Percentage of fields containing multiple weed species",
+       subtitle = "NSW AEZ zones, years 2011-2019") +
+  #theme_minimal() +
+  theme(panel.grid.minor = element_blank())
+
+# ## just check
+# # how many paddock all up
+# dim(Number_weeds_per_paddock %>% filter(count_weeds == 1))
+# #(191/1299)*100 = 14.7% - so it looks correct
+
+
+
+ggsave(
+  device = "png",
+  filename = "Percentage of fields containing multiple weed species VIC.png",
+  path= "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+) 
 ```

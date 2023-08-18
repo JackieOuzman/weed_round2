@@ -45,7 +45,7 @@ HR_weed_list_long <-HR_weed_list_long %>%
 
 ## remove all the rows with missing weeds
 HR_weed_list_long_remove_na <- HR_weed_list_long %>% filter(!is.na(weed_class))
-
+rm(HR_weed_list_long, HR_weed_list)
 ################################################################################
 ### make a list of weeds per zone
 str(HR_weed_list_long_remove_na)
@@ -60,6 +60,8 @@ str(list_of_weed_AEZ)
 
 write.csv(list_of_weed_AEZ, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/list_of_weed_AEZ.csv", row.names = FALSE)
 
+
+
 ################################################################################
 ## how many weeds per zone
 list_of_weed_AEZ_count <- list_of_weed_AEZ %>% count(AEZ)
@@ -67,6 +69,8 @@ str(list_of_weed_AEZ_count)
 
 list_of_weed_AEZ_count <- list_of_weed_AEZ_count %>% rename(`Number of weeds ID` = n)
 write.csv(list_of_weed_AEZ_count, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/list_of_weed_AEZ_count.csv", row.names = FALSE)
+
+rm(list_of_weed_AEZ,list_of_weed_AEZ_count )
 
 
 ################################################################################
@@ -82,6 +86,24 @@ str(paddock_per_AEZ_year)
 paddock_per_AEZ_year <- paddock_per_AEZ_year %>%  rename(`count of paddocks` = n)
 
 paddock_per_AEZ_year
+
+
+paddock_per_AEZ_year %>% 
+  ggplot(aes(as.factor(Year),  `count of paddocks`, group=AEZ, color = AEZ))+
+  geom_point()+
+   theme_bw()+ 
+   labs(title = "Number of paddock by AEZ and Year",
+        x = "Year",  
+        y ="Number of paddocks smapled")
+
+ggsave(
+  device = "png",
+  filename = "Number of paddock.png",
+  path= "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+) 
 
 ################################################################################
 #count the number of weed occurrence per AEZ, weed and year  
@@ -103,6 +125,7 @@ AEZ_weeds <- AEZ_weeds %>% mutate(percent_occurance = (count/`count of paddocks`
 AEZ_weeds$percent_occurance <- round(AEZ_weeds$percent_occurance, 2)
 
 AEZ_weeds
+rm(paddock_per_AEZ_year, AEZ_weeds_count)
 
 ################################################################################
 ## add a rank ## ranks without averaging # first occurrence wins
@@ -112,10 +135,7 @@ AEZ_weeds <- AEZ_weeds %>% arrange(AEZ, Year) %>%
   group_by(AEZ, Year) %>%
   mutate(rank = rank(-percent_occurance, ties.method= "first"))
 
-test <- AEZ_weeds %>% filter(Year == 2013) %>% 
-  filter(AEZ == "NSW NE Qld SE") %>% 
-  arrange(AEZ, Year) %>%
-  mutate(rank = rank(-percent_occurance, ties.method= "first"))
+
 
 ################################################################################
 # keep the top 4 weeds in each AEZ and year
@@ -134,7 +154,7 @@ top4weeds$percent_occurance <- round(top4weeds$percent_occurance, 0)
 top4weeds <- top4weeds %>% arrange(AEZ, Year, rank)
 
 
-
+write.csv(top4weeds, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/top4weeds.csv")
 
 
 
@@ -160,6 +180,7 @@ label_weed2 <- rank %>%
   filter(rank == 2) %>% 
   distinct(Year,AEZ, .keep_all = TRUE)
 
+rm(top4weeds)
 
 ### Plot of weed 1 and 2
 rank %>% 
@@ -323,7 +344,7 @@ ggsave(
   dpi=600
 ) 
 
-
+rm(AEZ_weeds, label_weed1, label_weed2,rank, rank_density_mode_display_weed1, rank_density_mode_display_weed2)
 
 
 ################################################################################
@@ -351,7 +372,7 @@ Final_list_AEZ_Year <-Final_list_AEZ_Year %>%
 
 write.csv(Final_list_AEZ_Year, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank1_2_weed_AEZ_year.csv")
 
-
+rm(rank_density_mode, rank1_2)
 ################################################################################
 ### Turn into a table
 
@@ -472,16 +493,56 @@ DT_Rank2_test[DT_Rank2_test == "Percentage = NA Density = NA"] <- NA
 datatable(DT_Rank2_test,  caption = 'Rank 2: 2nd Most common weed per AEZ and year.')
 
 
+rm(DT_Rank1_a, DT_Rank2_a, DT_Rank1, DT_Rank2)
+
 write.csv(DT_Rank1_test, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank1_weed_AEZ_year_format.csv")
 write.csv(DT_Rank2_test, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank2_weed_AEZ_year_format.csv")
 
-#### Up to here I have list of weed and rank and % of paddocks
-
-### now add in the densities and number of species per paddock plots
-## Think about how I can display this which is not a table?
 
 
+###############################################################################
+### How many weeds per paddock per year
 
+str(HR_weed_list_long_remove_na)
+
+
+Number_weeds_per_paddock <- HR_weed_list_long_remove_na %>% 
+  group_by(Sample, Year) %>% 
+  summarise(n = n())
+
+Number_weeds_per_paddock <-Number_weeds_per_paddock %>% rename(count_weeds = n )
+Number_weeds_per_paddock$count_weeds <- as.factor(Number_weeds_per_paddock$count_weeds)
+
+ggplot(data = Number_weeds_per_paddock, aes(x = count_weeds)) +
+  geom_histogram(aes(
+    x = count_weeds,
+    y = (..count.. / sum(..count..)) * 100),
+    #fill = ..x..  ),
+  stat = 'count',
+  show.legend = FALSE) +
+  scale_x_discrete(drop = FALSE) +
+  labs(x = 'Number of weed species per paddock', 
+       y = 'Percent', 
+       title = "Percentage of fields containing multiple weed species",
+       subtitle = "VIC AEZ zones, years 2011-2019") +
+  #theme_minimal() +
+  theme(panel.grid.minor = element_blank())
+
+## just check
+# how many paddock all up
+dim(Number_weeds_per_paddock %>% filter(count_weeds == 1))
+#(191/1299)*100 = 14.7% - so it looks correct
+
+
+
+ggsave(
+  device = "png",
+  filename = "Percentage of fields containing multiple weed species VIC.png",
+  path= "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+) 
 
 
 
