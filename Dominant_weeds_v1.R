@@ -5,6 +5,7 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(ggpubr)
+library(DT)
 
 
 ################################################################################
@@ -281,7 +282,16 @@ rank1_plot <- rank_density_mode %>%
 ### Add the mode data
 rank1_plot + geom_point(data = rank_density_mode_display_weed1, aes(as.factor(Year),  weed_class_Mode))
 
-  
+ggsave(
+  device = "png",
+  filename = "Rank1.png",
+  path= "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+) 
+
+
  
 
 ### Plot of weed 1 and 2
@@ -304,8 +314,166 @@ rank2_plot <- rank_density_mode %>%
 ### Add the mode data
 rank2_plot + geom_point(data = rank_density_mode_display_weed2, aes(as.factor(Year),  weed_class_Mode))
 
+ggsave(
+  device = "png",
+  filename = "Rank2.png",
+  path= "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+) 
 
 
+
+
+################################################################################
+### Final list of weeds 
+
+str(rank_density_mode)
+
+Final_list_AEZ_Year <-      rank_density_mode %>% 
+  distinct(Year, AEZ, rank, .keep_all = TRUE) %>% 
+  select(Year, AEZ, rank, weed, percent_occurance, mode ) %>% 
+  arrange(AEZ, Year, rank)
+
+Final_list_AEZ_Year <-Final_list_AEZ_Year %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    )
+  )
+
+
+write.csv(Final_list_AEZ_Year, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank1_2_weed_AEZ_year.csv")
+
+
+################################################################################
+### Turn into a table
+
+DT_Rank1 <- Final_list_AEZ_Year %>% filter(rank == 1) %>% 
+  select(-mode, - weed_class_Mode, -rank) %>% 
+  pivot_wider(names_from = Year,
+              values_from =percent_occurance) 
+ 
+DT_Rank1 <- DT_Rank1 %>% rename(
+  OCC_2011 = `2011`,
+  OCC_2012 = `2012`,
+  OCC_2013 = `2013`,
+  OCC_2014 = `2014`,
+  OCC_2015 = `2015`,
+  OCC_2016 = `2016`,
+  OCC_2017 = `2017`,
+  OCC_2018 = `2018`,
+  OCC_2019 = `2019`
+)
+
+
+DT_Rank1_a <- Final_list_AEZ_Year %>% filter(rank == 1) %>% 
+  select(-mode,  -rank, -percent_occurance) %>% 
+  pivot_wider(names_from = Year,
+              values_from =weed_class_Mode) 
+  
+
+DT_Rank1_a <- DT_Rank1_a %>% rename(
+  den_2011 = `2011`,
+  den_2012 = `2012`,
+  den_2013 = `2013`,
+  den_2014 = `2014`,
+  den_2015 = `2015`,
+  den_2016 = `2016`,
+  den_2017 = `2017`,
+  den_2018 = `2018`,
+  den_2019 = `2019`
+)
+
+
+DT_Rank1_test <- left_join(DT_Rank1, DT_Rank1_a)
+
+DT_Rank1_test <- DT_Rank1_test %>% 
+  mutate(Year2011 = paste0("Percentage = " ,OCC_2011, " Density = ", den_2011),
+         Year2012 = paste0("Percentage = " ,OCC_2012, " Density = ", den_2012),
+         Year2013 = paste0("Percentage = " ,OCC_2013, " Density = ", den_2013),
+         Year2014 = paste0("Percentage = " ,OCC_2014, " Density = ", den_2014),
+         Year2015 = paste0("Percentage = " ,OCC_2015, " Density = ", den_2015),
+         Year2016 = paste0("Percentage = " ,OCC_2016, " Density = ", den_2016),
+         Year2017 = paste0("Percentage = " ,OCC_2017, " Density = ", den_2017),
+         Year2018 = paste0("Percentage = " ,OCC_2018, " Density = ", den_2018),
+         Year2019 = paste0("Percentage = " ,OCC_2019, " Density = ", den_2019)
+         ) %>% 
+  select(AEZ:weed, Year2011:Year2019)
+
+DT_Rank1_test[DT_Rank1_test == "Percentage = NA Density = NA"] <- NA
+datatable(DT_Rank1_test,  caption = 'Rank 1: Most common weed per AEZ and year.')
+
+
+
+
+
+
+DT_Rank2 <- Final_list_AEZ_Year %>% filter(rank == 2) %>% 
+  select(-mode, - weed_class_Mode, -rank) %>% 
+  pivot_wider(names_from = Year,
+              values_from =percent_occurance) 
+
+DT_Rank2 <- DT_Rank2 %>% rename(
+  OCC_2011 = `2011`,
+  OCC_2012 = `2012`,
+  OCC_2013 = `2013`,
+  OCC_2014 = `2014`,
+  OCC_2015 = `2015`,
+  OCC_2016 = `2016`,
+  OCC_2017 = `2017`,
+  OCC_2018 = `2018`,
+  OCC_2019 = `2019`
+)
+
+
+DT_Rank2_a <- Final_list_AEZ_Year %>% filter(rank == 2) %>% 
+  select(-mode,  -rank, -percent_occurance) %>% 
+  pivot_wider(names_from = Year,
+              values_from =weed_class_Mode) 
+
+
+DT_Rank2_a <- DT_Rank2_a %>% rename(
+  den_2011 = `2011`,
+  den_2012 = `2012`,
+  den_2013 = `2013`,
+  den_2014 = `2014`,
+  den_2015 = `2015`,
+  den_2016 = `2016`,
+  den_2017 = `2017`,
+  den_2018 = `2018`,
+  den_2019 = `2019`
+)
+
+
+DT_Rank2_test <- left_join(DT_Rank2, DT_Rank2_a)
+
+
+DT_Rank2_test <- DT_Rank2_test %>% 
+  mutate(Year2011 = paste0("Percentage = " ,OCC_2011, " Density = ", den_2011),
+         Year2012 = paste0("Percentage = " ,OCC_2012, " Density = ", den_2012),
+         Year2013 = paste0("Percentage = " ,OCC_2013, " Density = ", den_2013),
+         Year2014 = paste0("Percentage = " ,OCC_2014, " Density = ", den_2014),
+         Year2015 = paste0("Percentage = " ,OCC_2015, " Density = ", den_2015),
+         Year2016 = paste0("Percentage = " ,OCC_2016, " Density = ", den_2016),
+         Year2017 = paste0("Percentage = " ,OCC_2017, " Density = ", den_2017),
+         Year2018 = paste0("Percentage = " ,OCC_2018, " Density = ", den_2018),
+         Year2019 = paste0("Percentage = " ,OCC_2019, " Density = ", den_2019)
+  ) %>% 
+  select(AEZ:weed, Year2011:Year2019)
+
+DT_Rank2_test[DT_Rank2_test == "Percentage = NA Density = NA"] <- NA
+datatable(DT_Rank2_test,  caption = 'Rank 2: 2nd Most common weed per AEZ and year.')
+
+
+write.csv(DT_Rank1_test, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank1_weed_AEZ_year_format.csv")
+write.csv(DT_Rank2_test, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank2_weed_AEZ_year_format.csv")
 
 #### Up to here I have list of weed and rank and % of paddocks
 
@@ -328,184 +496,3 @@ rank2_plot + geom_point(data = rank_density_mode_display_weed2, aes(as.factor(Ye
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################################################################################
-### higher level look - sum of weeds for each zone
-
-## remove all the rows with missing weeds
-HR_weed_list_long_remove_na <- HR_weed_list_long %>% filter(!is.na(weed_class))
-
-#count the number of occurrence per AEZ, weed and year  
-AEZ_weeds_count <- HR_weed_list_long_remove_na %>% count(AEZ, weed, Year, sort = TRUE)    
-AEZ_weeds_count <- AEZ_weeds_count %>%  arrange(AEZ, weed, Year)
-str(AEZ_weeds_count) 
-AEZ_weeds_count <- AEZ_weeds_count %>%  rename(count = n)
-
-#count the number of occurrence per AEZ and year
-AEZ_weeds_tally <- HR_weed_list_long_remove_na %>% count(AEZ, Year, sort = TRUE) 
-AEZ_weeds_tally <- AEZ_weeds_tally %>%  arrange(AEZ, Year)
-AEZ_weeds_tally <- AEZ_weeds_tally %>%  rename(tally = n)
-
-
-#### join the summary data together
-AEZ_weeds <- left_join(AEZ_weeds_count,AEZ_weeds_tally)
-## add a percent 
-AEZ_weeds <- AEZ_weeds %>% mutate(percent_occurance = (count/tally)*100) 
-AEZ_weeds$percent_occurance <- round(AEZ_weeds$percent_occurance, 2)
-
-## add a rank
-str(AEZ_weeds)
-
-AEZ_weeds <- AEZ_weeds %>% arrange(AEZ, Year) %>%
-  group_by(AEZ, Year) %>%
-  mutate(rank = rank(percent_occurance))
- 
-#https://www.r-bloggers.com/2022/07/how-to-rank-by-group-in-r/
-# This has some tip on dealing with ties - I have not implemented this yet.
-
-AEZ_weed1 <- AEZ_weeds %>%
-  group_by(AEZ, Year) %>%
-  filter(percent_occurance == max(percent_occurance, na.rm=TRUE))
-AEZ_weed1 <- ungroup(AEZ_weed1)
-
-AEZ_weed1 <-AEZ_weed1 %>% rename (weed1 = weed,
-                                  count_weed1 = count,
-                                  perecent_occurance_weed1 = percent_occurance,
-                                  rank_weed1 = rank) %>% 
-  select (-tally)
-
-### I am returning more than one because of ties
-str(AEZ_weed1)
-AEZ_weed1 <- AEZ_weed1 %>% mutate(tie_breaker = paste0(AEZ,"_", Year, "_", rank_weed1 )) 
-
-AEZ_weed1 <- AEZ_weed1 %>% distinct(tie_breaker, .keep_all = TRUE) 
-AEZ_weed1 <- AEZ_weed1 %>% select(-tie_breaker)
-
-str(AEZ_weed1)
-
-AEZ_weed2 <- AEZ_weeds %>%
-  group_by(AEZ, Year) %>%
-  filter(percent_occurance == max(percent_occurance[percent_occurance != max(percent_occurance)]))
-
-AEZ_weed2 <- ungroup(AEZ_weed2)
-str(AEZ_weed2)
-AEZ_weed2 <-AEZ_weed2 %>% rename (weed2 = weed,
-                                  count_weed2 = count,
-                                  perecent_occurance_weed2 = percent_occurance,
-                                  rank_weed2 = rank) %>% 
-  select (-tally)
-
-
-
-
-### I am returning more than one because of ties
-str(AEZ_weed2)
-AEZ_weed2 <- AEZ_weed2 %>% mutate(tie_breaker = paste0(AEZ,"_", Year, "_", rank_weed2 )) 
-  
-AEZ_weed2 <- AEZ_weed2 %>% distinct(tie_breaker, .keep_all = TRUE) 
-AEZ_weed2 <- AEZ_weed2 %>% select(-tie_breaker)
-
-#### weed 1 and 2 list
-
-AEZ_weed1_2 <- left_join(AEZ_weed1, AEZ_weed2, by=c("AEZ" , "Year" )) 
-str(AEZ_weed1_2)
-AEZ_weed1_2 <- AEZ_weed1_2 %>% select(AEZ, Year, weed1, weed2, perecent_occurance_weed1, rank_weed1, perecent_occurance_weed2, rank_weed2)
-
-
-
-
-AEZ_weeds <- ungroup(AEZ_weeds)
-str(AEZ_weeds)
-str(AEZ_weed1_2)
-
-ggplot(data=AEZ_weeds, aes(as.factor(Year),perecent_occurance))+
-  geom_point(aes(colour = weed), size = 4)+
-  facet_wrap(.~AEZ)+
-  geom_text(data=AEZ_weed1_2, aes(label=weed1,y=90,x=as.factor(Year)), angle = 90, size =2.0, colour= "black")+
-  geom_text(data=AEZ_weed1_2, aes(label=weed2,y=60,x=as.factor(Year)), angle = 90, size =2.0, colour= "darkblue")+
-  theme_bw()+ 
-  labs(title = "Most common weed by AEZ and Year",
-        subtitle = "Weed1 = black, weed2 = blue",
-        caption = "Using: Weed Species locations no co-ordinates.xlsx",
-        x = "Year",  
-        y ="Percentage occurrence (weed / all weeds recorded in AEZ by year)")+
-  theme(legend.key.size = unit(0.01, 'cm'))+
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-ggsave(
-  device = "png",
-  filename = "Common_weed_draft1.png",
-  path= "W:/Economic impact of weeds round 2/HR/Jackie_working/",
-  width=9.5,
-  height = 6.28,
-  dpi=600
-) 
-
-
-
-
-###############################################################################
-### not sure I need the follow code
-
-
-
-
-
-
-################################################################################
-### sum of weeds for each zone
-
-
-
-AEZ1 <- HR_weed_list_long %>% 
-  filter(AEZ == "NSW NW Qld SW") %>% 
-  filter(!is.na(weed_class)) %>% 
-  dplyr::select(AEZ, Year, weed, weed_class, weed_class_code) %>% 
-  arrange(weed,Year, weed_class ) 
-str(AEZ1)  
-
-AEZ1_weeds_count <-AEZ1 %>% count(weed, AEZ, Year, sort = TRUE)    
-str(AEZ1_weeds_count) 
-
-AEZ1_weeds_count <- AEZ1_weeds_count %>%  rename(count = n)
-
-ggplot(data=AEZ1_weeds_count, aes(Year,count ))+
-  #geom_point()+
-  geom_point(aes(colour = weed), size = 4)
-
-
-### what was the weed class?
-
-AEZ1$weed_class_code <- as.double(AEZ1$weed_class_code)
-#I need a function to cal mode!
-mode <- function(codes){
-  which.max(tabulate(codes))
-}
-
-AEZ1_weeds_code <- AEZ1 %>% 
-  group_by(weed, AEZ, Year) %>% 
-  summarise(
-    mode =mode(weed_class_code),
-    median = median(weed_class_code, na.rm = TRUE)
-            )
-
-
-
-       

@@ -13,6 +13,7 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 library(ggpubr)
+library(DT)
 
 
 ```
@@ -111,7 +112,7 @@ paddock_per_AEZ_year
 ## Rank of weeds per AEZ / year based on all paddocks sampled in that year / AEZ
 Also calculating the % of weed in all the paddocks sampled (e.g per AEZ and paddock) 
 
-```{r Rank and occurance cals, echo=FALSE, message=FALSE, warning=FALSE}
+```{r Rank and occurance cals1, echo=FALSE, message=FALSE, warning=FALSE}
 
 ################################################################################
 #count the number of weed occurrence per AEZ, weed and year  
@@ -225,7 +226,8 @@ rank %>%
 ```
 
 
-Add the summaries mode data to the plots and chcek its good
+Add the summaries mode data to the plots and check its good
+
 
 
 ```{r mode, echo=FALSE, message=FALSE, warning=FALSE}
@@ -343,5 +345,177 @@ rank2_plot <- rank_density_mode %>%
 ### Add the mode data
 rank2_plot + geom_point(data = rank_density_mode_display_weed2, aes(as.factor(Year),  weed_class_Mode))
 
+
+```
+
+## Final list of weeds
+
+
+```{r final list of weeds, echo=FALSE, message=FALSE, warning=FALSE}
+
+################################################################################
+### Final list of weeds 
+
+#str(rank_density_mode)
+
+Final_list_AEZ_Year <-      rank_density_mode %>% 
+  distinct(Year, AEZ, rank, .keep_all = TRUE) %>% 
+  select(Year, AEZ, rank, weed, percent_occurance, mode ) %>% 
+  arrange(AEZ, Year, rank)
+
+Final_list_AEZ_Year <-Final_list_AEZ_Year %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    )
+  )
+
+
+write.csv(Final_list_AEZ_Year, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank1_2_weed_AEZ_year.csv")
+
+
+```
+
+
+# As a table 
+
+```{r final list of weeds as table working, message=FALSE, warning=FALSE, include=FALSE}
+################################################################################
+### Turn into a table
+
+DT_Rank1 <- Final_list_AEZ_Year %>% filter(rank == 1) %>% 
+  select(-mode, - weed_class_Mode, -rank) %>% 
+  pivot_wider(names_from = Year,
+              values_from =percent_occurance) 
+ 
+DT_Rank1 <- DT_Rank1 %>% rename(
+  OCC_2011 = `2011`,
+  OCC_2012 = `2012`,
+  OCC_2013 = `2013`,
+  OCC_2014 = `2014`,
+  OCC_2015 = `2015`,
+  OCC_2016 = `2016`,
+  OCC_2017 = `2017`,
+  OCC_2018 = `2018`,
+  OCC_2019 = `2019`
+)
+
+
+DT_Rank1_a <- Final_list_AEZ_Year %>% filter(rank == 1) %>% 
+  select(-mode,  -rank, -percent_occurance) %>% 
+  pivot_wider(names_from = Year,
+              values_from =weed_class_Mode) 
+  
+
+DT_Rank1_a <- DT_Rank1_a %>% rename(
+  den_2011 = `2011`,
+  den_2012 = `2012`,
+  den_2013 = `2013`,
+  den_2014 = `2014`,
+  den_2015 = `2015`,
+  den_2016 = `2016`,
+  den_2017 = `2017`,
+  den_2018 = `2018`,
+  den_2019 = `2019`
+)
+
+
+DT_Rank1_test <- left_join(DT_Rank1, DT_Rank1_a)
+
+DT_Rank1_test <- DT_Rank1_test %>% 
+  mutate(Year2011 = paste0("Percentage = " ,OCC_2011, " Density = ", den_2011),
+         Year2012 = paste0("Percentage = " ,OCC_2012, " Density = ", den_2012),
+         Year2013 = paste0("Percentage = " ,OCC_2013, " Density = ", den_2013),
+         Year2014 = paste0("Percentage = " ,OCC_2014, " Density = ", den_2014),
+         Year2015 = paste0("Percentage = " ,OCC_2015, " Density = ", den_2015),
+         Year2016 = paste0("Percentage = " ,OCC_2016, " Density = ", den_2016),
+         Year2017 = paste0("Percentage = " ,OCC_2017, " Density = ", den_2017),
+         Year2018 = paste0("Percentage = " ,OCC_2018, " Density = ", den_2018),
+         Year2019 = paste0("Percentage = " ,OCC_2019, " Density = ", den_2019)
+         ) %>% 
+  select(AEZ:weed, Year2011:Year2019)
+
+DT_Rank1_test[DT_Rank1_test == "Percentage = NA Density = NA"] <- NA
+datatable(DT_Rank1_test,  caption = 'Rank 1: Most common weed per AEZ and year.')
+
+
+
+
+
+
+DT_Rank2 <- Final_list_AEZ_Year %>% filter(rank == 2) %>% 
+  select(-mode, - weed_class_Mode, -rank) %>% 
+  pivot_wider(names_from = Year,
+              values_from =percent_occurance) 
+
+DT_Rank2 <- DT_Rank2 %>% rename(
+  OCC_2011 = `2011`,
+  OCC_2012 = `2012`,
+  OCC_2013 = `2013`,
+  OCC_2014 = `2014`,
+  OCC_2015 = `2015`,
+  OCC_2016 = `2016`,
+  OCC_2017 = `2017`,
+  OCC_2018 = `2018`,
+  OCC_2019 = `2019`
+)
+
+
+DT_Rank2_a <- Final_list_AEZ_Year %>% filter(rank == 2) %>% 
+  select(-mode,  -rank, -percent_occurance) %>% 
+  pivot_wider(names_from = Year,
+              values_from =weed_class_Mode) 
+
+
+DT_Rank2_a <- DT_Rank2_a %>% rename(
+  den_2011 = `2011`,
+  den_2012 = `2012`,
+  den_2013 = `2013`,
+  den_2014 = `2014`,
+  den_2015 = `2015`,
+  den_2016 = `2016`,
+  den_2017 = `2017`,
+  den_2018 = `2018`,
+  den_2019 = `2019`
+)
+
+
+DT_Rank2_test <- left_join(DT_Rank2, DT_Rank2_a)
+
+
+DT_Rank2_test <- DT_Rank2_test %>% 
+  mutate(Year2011 = paste0("Percentage = " ,OCC_2011, " Density = ", den_2011),
+         Year2012 = paste0("Percentage = " ,OCC_2012, " Density = ", den_2012),
+         Year2013 = paste0("Percentage = " ,OCC_2013, " Density = ", den_2013),
+         Year2014 = paste0("Percentage = " ,OCC_2014, " Density = ", den_2014),
+         Year2015 = paste0("Percentage = " ,OCC_2015, " Density = ", den_2015),
+         Year2016 = paste0("Percentage = " ,OCC_2016, " Density = ", den_2016),
+         Year2017 = paste0("Percentage = " ,OCC_2017, " Density = ", den_2017),
+         Year2018 = paste0("Percentage = " ,OCC_2018, " Density = ", den_2018),
+         Year2019 = paste0("Percentage = " ,OCC_2019, " Density = ", den_2019)
+  ) %>% 
+  select(AEZ:weed, Year2011:Year2019)
+
+DT_Rank2_test[DT_Rank2_test == "Percentage = NA Density = NA"] <- NA
+datatable(DT_Rank2_test,  caption = 'Rank 2: 2nd Most common weed per AEZ and year.')
+
+
+write.csv(DT_Rank1_test, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank1_weed_AEZ_year_format.csv")
+write.csv(DT_Rank2_test, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank2_weed_AEZ_year_format.csv")
+
+```
+
+
+```{r final list of weeds as table, echo=FALSE, message=FALSE, warning=FALSE}
+
+datatable(DT_Rank1_test,  caption = 'Rank 1: Most common weed per AEZ and year.')
+
+
+datatable(DT_Rank2_test,  caption = 'Rank 2: 2nd Most common weed per AEZ and year.')
 
 ```
