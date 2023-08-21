@@ -20,12 +20,16 @@ HR_weed_list_Tas <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data
                                 sheet = "Tas")
 
 
+## Add ID to dataset so each row has a unique ID
+HR_weed_list_NSW <- HR_weed_list_NSW %>% 
+  mutate(ID = row_number()) %>% 
+  mutate(ID_Jaxs = paste0(ID,"_NSW"))
 
-
-
+HR_weed_list_NSW <- HR_weed_list_NSW %>% select(-ID)
+HR_weed_list_NSW <- HR_weed_list_NSW %>% select(ID_Jaxs, everything())
 ## make it long NSW
 str(HR_weed_list_NSW)
-HR_weed_list_NSW <- HR_weed_list_NSW%>%  dplyr::select(Sample:Wireweed)
+HR_weed_list_NSW <- HR_weed_list_NSW%>%  dplyr::select(ID_Jaxs:Wireweed)
 str(HR_weed_list_NSW)
 HR_weed_list_NSW <- HR_weed_list_NSW %>%  rename(AEZ = `GRDC AEZ`)
 
@@ -43,6 +47,16 @@ str(HR_weed_list_NSW_long)
 str(HR_weed_list_Tas)
 HR_weed_list_Tas <- HR_weed_list_Tas%>%  dplyr::select(Sample:Wireweed)
 str(HR_weed_list_Tas)
+## Add ID to dataset so each row has a unique ID
+HR_weed_list_Tas <- HR_weed_list_Tas %>% 
+  mutate(ID = row_number()) %>% 
+  mutate(ID_Jaxs = paste0(ID,"_Tas"))
+
+HR_weed_list_Tas <- HR_weed_list_Tas %>% select(-ID)
+HR_weed_list_Tas <- HR_weed_list_Tas %>% select(ID_Jaxs, everything())
+
+
+
 HR_weed_list_Tas <- HR_weed_list_Tas %>%  rename(AEZ = `GRDC AEZ`)
 
 HR_weed_list_Tas_long <- pivot_longer(HR_weed_list_Tas,
@@ -120,7 +134,7 @@ rm(list_of_weed_AEZ,list_of_weed_AEZ_count )
 ################################################################################
 ## how many paddocks per zone
 str(HR_weed_list_long_remove_na)
-#paddock_per_AEZ_year_test1 <- HR_weed_list_long_remove_na %>%  count(Sample, AEZ, Year) #
+
 paddock_per_AEZ_year <- HR_weed_list_long %>%  count(Sample, AEZ, Year) #
 
 
@@ -612,10 +626,176 @@ ggsave(
 
 
 
+################################################################################
+################################################################################
+## All years to get weed list ranking ###
+################################################################################
+################################################################################
+rm(list=ls()[! ls() %in% c("HR_weed_list_long","HR_weed_list_long_remove_na")])
+
+str(HR_weed_list_long)
+str(HR_weed_list_long_remove_na)
+
+### make a new sample ID that includes the year.
+
+HR_weed_list_long <- HR_weed_list_long %>% mutate(Sampl_ID_Yr = paste0(Sample,"_", Year))
+HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>% mutate(Sampl_ID_Yr = paste0(Sample,"_", Year))
+
+paddock_per_AEZ <- HR_weed_list_long %>%  count(ID_Jaxs, AEZ) %>%  select (ID_Jaxs, AEZ) #This is just a list of paddock
+paddock_per_AEZ_1 <- paddock_per_AEZ %>% count(AEZ)
+  
+paddock_per_AEZ_1 <-paddock_per_AEZ_1 %>%  rename(`count of paddocks` = n)
+################################################################################
+#count the number of weed occurrence per AEZ, weed   
+AEZ_weeds_count <- HR_weed_list_long_remove_na %>% count(AEZ, weed, sort = TRUE)    
+AEZ_weeds_count <- AEZ_weeds_count %>%  arrange(AEZ, weed)
+str(AEZ_weeds_count) 
+AEZ_weeds_count <- AEZ_weeds_count %>%  rename(count = n)
+
+#count the number of paddocks sampled per AEZ (from above)
+paddock_per_AEZ_1
+
+################################################################################
+#### join the summary data together
+AEZ_weeds <- left_join(AEZ_weeds_count,paddock_per_AEZ_1)
+## add a percent 
+
+str(AEZ_weeds)
+AEZ_weeds <- AEZ_weeds %>% mutate(percent_occurance = (count/`count of paddocks`)*100) 
+AEZ_weeds$percent_occurance <- round(AEZ_weeds$percent_occurance, 2)
+
+AEZ_weeds
+rm( AEZ_weeds_count)#paddock_per_AEZ_year
+
+################################################################################
+## add a rank ## ranks without averaging # first occurrence wins
+str(AEZ_weeds)
+
+AEZ_weeds <- AEZ_weeds %>% arrange(AEZ) %>%
+  group_by(AEZ) %>%
+  mutate(rank = rank(-percent_occurance, ties.method= "first"))
 
 
 
+################################################################################
+# keep the top 4 weeds in each AEZ and year
 
+top4weeds <- AEZ_weeds %>% 
+  group_by(AEZ) %>%
+  top_n(-4, rank)
+
+str(top4weeds)
+top4weeds <- ungroup(top4weeds)
+
+top4weeds <- top4weeds %>%  select(AEZ, weed, percent_occurance, rank)
+
+
+top4weeds$percent_occurance <- round(top4weeds$percent_occurance, 0)
+top4weeds <- top4weeds %>% arrange(AEZ, rank)
+
+
+write.csv(top4weeds, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/top4weeds_noYear.csv")
+
+
+
+################################################################################
+#Addd ranking to the long list of weeds
+
+rank1_2 <- top4weeds %>% filter(rank == 1 | rank==2) 
+rank <- left_join(HR_weed_list_long_remove_na, rank1_2)
+## remove all the rows with missing weeds
+rank <- rank %>% filter(!is.na(rank))
+str(rank)
+unique(rank$weed_class)
+
+
+
+###summaries the weed class   
+str(rank)
+
+rank$weed_class_code <- as.double(rank$weed_class_code)
+#I need a function to cal mode!
+mode <- function(codes){
+  which.max(tabulate(codes))
+}
+
+rank_AEZ_weed_densities <- rank %>% 
+  group_by(weed, AEZ, rank) %>% 
+  summarise(
+    mode =mode(weed_class_code),
+    median = median(weed_class_code, na.rm = TRUE)
+  ) %>% 
+  arrange(AEZ, rank )
+
+
+################################################################################
+str(rank_AEZ_weed_densities)
+rank_AEZ_weed_densities <- ungroup(rank_AEZ_weed_densities)
+
+### add the mode and median back into the rank data 
+rank_density_mode <- left_join(rank, rank_AEZ_weed_densities)
+
+
+
+rank_density_mode_display_weed1 <- rank_density_mode %>% 
+  filter(rank == 1) %>% 
+  distinct(Year,AEZ, .keep_all = TRUE) %>% select(AEZ, mode)
+rank_density_mode_display_weed2 <- rank_density_mode %>% 
+  filter(rank == 2) %>% 
+  distinct(Year,AEZ, .keep_all = TRUE) %>% select(AEZ, mode)
+
+### recode mode.
+
+## recode weed class with an number
+rank_density_mode_display_weed1 <-rank_density_mode_display_weed1 %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    )
+  )
+
+rank_density_mode_display_weed2 <-rank_density_mode_display_weed2 %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    )
+  )
+
+
+################################################################################
+### Final list of weeds 
+
+str(rank_density_mode)
+
+Final_list_AEZ <-      rank_density_mode %>% 
+  distinct(AEZ, rank, .keep_all = TRUE) %>% 
+  select(AEZ, rank, weed, percent_occurance, mode ) %>% 
+  arrange(AEZ, rank)
+
+Final_list_AEZ <-Final_list_AEZ %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    )
+  )
+
+
+write.csv(Final_list_AEZ, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/Final_Rank1_2_weed_AEZ.csv")
 
 
 
