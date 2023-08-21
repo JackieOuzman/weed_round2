@@ -23,8 +23,6 @@ library(DT)
 
 
 ```{r import the data, echo=FALSE, message=FALSE, warning=FALSE}
-HR_weed_list <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates.xlsx", 
-                                                     sheet = "NSW")
 HR_weed_list_NSW <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates.xlsx", 
                                                      sheet = "NSW")
 
@@ -32,12 +30,16 @@ HR_weed_list_Tas <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data
                                 sheet = "Tas")
 
 
+## Add ID to dataset so each row has a unique ID
+HR_weed_list_NSW <- HR_weed_list_NSW %>% 
+  mutate(ID = row_number()) %>% 
+  mutate(ID_Jaxs = paste0(ID,"_NSW"))
 
-
-
+HR_weed_list_NSW <- HR_weed_list_NSW %>% select(-ID)
+HR_weed_list_NSW <- HR_weed_list_NSW %>% select(ID_Jaxs, everything())
 ## make it long NSW
 str(HR_weed_list_NSW)
-HR_weed_list_NSW <- HR_weed_list_NSW%>%  dplyr::select(Sample:Wireweed)
+HR_weed_list_NSW <- HR_weed_list_NSW%>%  dplyr::select(ID_Jaxs:Wireweed)
 str(HR_weed_list_NSW)
 HR_weed_list_NSW <- HR_weed_list_NSW %>%  rename(AEZ = `GRDC AEZ`)
 
@@ -55,6 +57,16 @@ str(HR_weed_list_NSW_long)
 str(HR_weed_list_Tas)
 HR_weed_list_Tas <- HR_weed_list_Tas%>%  dplyr::select(Sample:Wireweed)
 str(HR_weed_list_Tas)
+## Add ID to dataset so each row has a unique ID
+HR_weed_list_Tas <- HR_weed_list_Tas %>% 
+  mutate(ID = row_number()) %>% 
+  mutate(ID_Jaxs = paste0(ID,"_Tas"))
+
+HR_weed_list_Tas <- HR_weed_list_Tas %>% select(-ID)
+HR_weed_list_Tas <- HR_weed_list_Tas %>% select(ID_Jaxs, everything())
+
+
+
 HR_weed_list_Tas <- HR_weed_list_Tas %>%  rename(AEZ = `GRDC AEZ`)
 
 HR_weed_list_Tas_long <- pivot_longer(HR_weed_list_Tas,
@@ -85,6 +97,8 @@ HR_weed_list_long <-HR_weed_list_long %>%
     )
   )
 
+
+
 #### drop AEZ that we wont use ###
 unique(HR_weed_list_long$AEZ)
 
@@ -95,7 +109,6 @@ HR_weed_list_long <- HR_weed_list_long %>% filter(  AEZ ==  "NSW NW Qld SW" |
                                                     AEZ ==  "NSW Central"|
                                                     AEZ ==  "Tas Grain"
                                                       )
-
 
 
 ## remove all the rows with missing weeds
@@ -144,7 +157,7 @@ list_of_weed_AEZ_count
 ```{r count of paddock per year and zone, echo=FALSE, message=FALSE, warning=FALSE}
 ################################################################################
 
-paddock_per_AEZ_year <- HR_weed_list_long %>%  count(Sample, AEZ, Year) #
+paddock_per_AEZ_year <- HR_weed_list_long %>%  count(ID_Jaxs, AEZ, Year) #
 paddock_per_AEZ_year <- paddock_per_AEZ_year %>% 
   group_by(AEZ, Year) %>% 
   count(AEZ)
@@ -304,6 +317,7 @@ Add the summaries mode data to the plots and check its good
 #str(rank)
 
 rank$weed_class_code <- as.double(rank$weed_class_code)
+rank <- rank %>% filter( !is.na(weed_class_code))
 #I need a function to cal mode!
 mode <- function(codes){
   which.max(tabulate(codes))

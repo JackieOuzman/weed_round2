@@ -135,7 +135,7 @@ rm(list_of_weed_AEZ,list_of_weed_AEZ_count )
 ## how many paddocks per zone
 str(HR_weed_list_long_remove_na)
 
-paddock_per_AEZ_year <- HR_weed_list_long %>%  count(Sample, AEZ, Year) #
+paddock_per_AEZ_year <- HR_weed_list_long %>%  count(ID_Jaxs, AEZ, Year) #
 
 
 paddock_per_AEZ_year <- paddock_per_AEZ_year %>% 
@@ -282,6 +282,9 @@ rank %>%
 str(rank)
 
 rank$weed_class_code <- as.double(rank$weed_class_code)
+rank <- rank %>% filter( !is.na(weed_class_code))
+
+
 #I need a function to cal mode!
 mode <- function(codes){
   which.max(tabulate(codes))
@@ -575,7 +578,7 @@ Number_weeds_per_paddock_na <- ungroup(Number_weeds_per_paddock_na)
 
 ## what about the paddocks with no weeds?
 
-list_of_paddock_sample_ID_Yr <- HR_weed_list_long %>% distinct(Sample, Year) %>% mutate(check="1")
+list_of_paddock_sample_ID_Yr <- HR_weed_list_long %>% distinct(ID_Jaxs, Year) %>% mutate(check="1")
 str(list_of_paddock_sample_ID_Yr)
 str(Number_weeds_per_paddock_na)
 
