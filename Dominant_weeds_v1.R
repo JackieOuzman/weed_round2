@@ -13,19 +13,50 @@ library(DT)
 ################################################################################
 
 
-HR_weed_list <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates.xlsx", 
+HR_weed_list_NSW <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates.xlsx", 
                                                      sheet = "NSW")
-## make it long
-str(HR_weed_list)
-HR_weed_list <- HR_weed_list%>%  dplyr::select(Sample:Wireweed)
-str(HR_weed_list)
-HR_weed_list <- HR_weed_list %>%  rename(AEZ = `GRDC AEZ`)
 
-HR_weed_list_long <- pivot_longer(HR_weed_list,
+HR_weed_list_Tas <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates.xlsx", 
+                                sheet = "Tas")
+
+
+
+
+
+## make it long NSW
+str(HR_weed_list_NSW)
+HR_weed_list_NSW <- HR_weed_list_NSW%>%  dplyr::select(Sample:Wireweed)
+str(HR_weed_list_NSW)
+HR_weed_list_NSW <- HR_weed_list_NSW %>%  rename(AEZ = `GRDC AEZ`)
+
+HR_weed_list_NSW_long <- pivot_longer(HR_weed_list_NSW,
                                   cols = c(`3 corner Jack`:`Wireweed`),
                                   names_to = "weed",
                                   values_to="weed_class"
                                   )
+
+
+str(HR_weed_list_NSW_long)
+
+
+## make it long Tas
+str(HR_weed_list_Tas)
+HR_weed_list_Tas <- HR_weed_list_Tas%>%  dplyr::select(Sample:Wireweed)
+str(HR_weed_list_Tas)
+HR_weed_list_Tas <- HR_weed_list_Tas %>%  rename(AEZ = `GRDC AEZ`)
+
+HR_weed_list_Tas_long <- pivot_longer(HR_weed_list_Tas,
+                                      cols = c(`3 corner Jack`:`Wireweed`),
+                                      names_to = "weed",
+                                      values_to="weed_class"
+)
+
+
+str(HR_weed_list_Tas_long)
+
+
+HR_weed_list_long <- rbind(HR_weed_list_NSW_long, HR_weed_list_Tas_long)
+rm(HR_weed_list_NSW, HR_weed_list_Tas, HR_weed_list_NSW_long,HR_weed_list_Tas_long,  )
 
 unique(HR_weed_list_long$weed_class)
 
@@ -43,9 +74,22 @@ HR_weed_list_long <-HR_weed_list_long %>%
   )
 
 
+
+#### drop AEZ that we wont use ###
+unique(HR_weed_list_long$AEZ)
+
+HR_weed_list_long <- HR_weed_list_long %>% filter(  AEZ ==  "NSW NW Qld SW" | 
+                                                    AEZ ==  "NSW NE Qld SE" |
+                                                    AEZ ==  "NSW Vic Slopes"|
+                                                    AEZ ==  "Vic High Rainfall"|
+                                                    AEZ ==  "NSW Central"|
+                                                    AEZ ==  "Tas Grain"
+                                                      )
+
+
 ## remove all the rows with missing weeds
 HR_weed_list_long_remove_na <- HR_weed_list_long %>% filter(!is.na(weed_class))
-rm(HR_weed_list_long, HR_weed_list)
+#rm(HR_weed_list_long, HR_weed_list)
 ################################################################################
 ### make a list of weeds per zone
 str(HR_weed_list_long_remove_na)
@@ -76,7 +120,9 @@ rm(list_of_weed_AEZ,list_of_weed_AEZ_count )
 ################################################################################
 ## how many paddocks per zone
 str(HR_weed_list_long_remove_na)
-paddock_per_AEZ_year <- HR_weed_list_long_remove_na %>%  count(Sample, AEZ, Year) #nope this is not what I want
+#paddock_per_AEZ_year_test1 <- HR_weed_list_long_remove_na %>%  count(Sample, AEZ, Year) #
+paddock_per_AEZ_year <- HR_weed_list_long %>%  count(Sample, AEZ, Year) #
+
 
 paddock_per_AEZ_year <- paddock_per_AEZ_year %>% 
   group_by(AEZ, Year) %>% 
@@ -105,6 +151,8 @@ ggsave(
   dpi=600
 ) 
 
+
+
 ################################################################################
 #count the number of weed occurrence per AEZ, weed and year  
 AEZ_weeds_count <- HR_weed_list_long_remove_na %>% count(AEZ, weed, Year, sort = TRUE)    
@@ -125,7 +173,7 @@ AEZ_weeds <- AEZ_weeds %>% mutate(percent_occurance = (count/`count of paddocks`
 AEZ_weeds$percent_occurance <- round(AEZ_weeds$percent_occurance, 2)
 
 AEZ_weeds
-rm(paddock_per_AEZ_year, AEZ_weeds_count)
+rm( AEZ_weeds_count)#paddock_per_AEZ_year
 
 ################################################################################
 ## add a rank ## ranks without averaging # first occurrence wins
@@ -503,13 +551,28 @@ write.csv(DT_Rank2_test, "W:/Economic impact of weeds round 2/HR/Jackie_working/
 ###############################################################################
 ### How many weeds per paddock per year
 
+str(HR_weed_list_long)
 str(HR_weed_list_long_remove_na)
 
-
-Number_weeds_per_paddock <- HR_weed_list_long_remove_na %>% 
+Number_weeds_per_paddock_na <- HR_weed_list_long_remove_na %>% 
   group_by(Sample, Year) %>% 
   summarise(n = n())
+Number_weeds_per_paddock_na <- ungroup(Number_weeds_per_paddock_na)
 
+## what about the paddocks with no weeds?
+
+list_of_paddock_sample_ID_Yr <- HR_weed_list_long %>% distinct(Sample, Year) %>% mutate(check="1")
+str(list_of_paddock_sample_ID_Yr)
+str(Number_weeds_per_paddock_na)
+
+Number_weeds_per_paddock <- left_join(list_of_paddock_sample_ID_Yr, Number_weeds_per_paddock_na)
+str(Number_weeds_per_paddock)
+
+### modify the clms so that the when there are no weeds I have zero value!
+
+Number_weeds_per_paddock <- Number_weeds_per_paddock %>% 
+  mutate(n = ifelse(is.na(n), 0, n))
+ 
 Number_weeds_per_paddock <-Number_weeds_per_paddock %>% rename(count_weeds = n )
 Number_weeds_per_paddock$count_weeds <- as.factor(Number_weeds_per_paddock$count_weeds)
 
@@ -524,9 +587,11 @@ ggplot(data = Number_weeds_per_paddock, aes(x = count_weeds)) +
   labs(x = 'Number of weed species per paddock', 
        y = 'Percent', 
        title = "Percentage of fields containing multiple weed species",
-       subtitle = "VIC AEZ zones, years 2011-2019") +
+       subtitle = "NSW and Tas AEZ zones, years 2011-2019") +
   #theme_minimal() +
   theme(panel.grid.minor = element_blank())
+
+
 
 ## just check
 # how many paddock all up
