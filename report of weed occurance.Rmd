@@ -80,7 +80,7 @@ str(HR_weed_list_Tas_long)
 
 
 HR_weed_list_long <- rbind(HR_weed_list_NSW_long, HR_weed_list_Tas_long)
-rm(HR_weed_list_NSW, HR_weed_list_Tas, HR_weed_list_NSW_long,HR_weed_list_Tas_long,  )
+#rm(HR_weed_list_NSW, HR_weed_list_Tas, HR_weed_list_NSW_long,HR_weed_list_Tas_long,  )
 
 unique(HR_weed_list_long$weed_class)
 
