@@ -572,7 +572,7 @@ str(HR_weed_list_long)
 str(HR_weed_list_long_remove_na)
 
 Number_weeds_per_paddock_na <- HR_weed_list_long_remove_na %>% 
-  group_by(Sample, Year) %>% 
+  group_by(ID_Jaxs, Year) %>% 
   summarise(n = n())
 Number_weeds_per_paddock_na <- ungroup(Number_weeds_per_paddock_na)
 
@@ -610,10 +610,7 @@ ggplot(data = Number_weeds_per_paddock, aes(x = count_weeds)) +
 
 
 
-## just check
-# how many paddock all up
-dim(Number_weeds_per_paddock %>% filter(count_weeds == 1))
-#(191/1299)*100 = 14.7% - so it looks correct
+
 
 
 
