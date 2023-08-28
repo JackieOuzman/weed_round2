@@ -141,4 +141,4 @@ summary_df_wide$yield <- round(summary_df_wide$yield ,1)
 
 
 ###############################################################################
-write.csv(summary_df, "W:/Economic impact of weeds round 2/production_data/Jackie_working/summary_production_data_yrs_group.csv",  row.names = FALSE)
+write.csv(summary_df_wide, "W:/Economic impact of weeds round 2/production_data/Jackie_working/summary_production_data_yrs_group.csv",  row.names = FALSE)
