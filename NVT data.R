@@ -69,6 +69,31 @@ NVT_all <- rbind(NVT_old_project, NVT)
 rm(NVT_old_project, NVT)
 
 
+### stuff around getting new crop type pulses - for the summary data
+NVT_all$crop <- as.character(NVT_all$crop)
+str(NVT_all$crop)
+
+NVT_all <- NVT_all %>%  mutate(crop = case_when(
+  crop == "Chickpea" ~  "Pulses",
+  crop == "Faba Bean" ~ "Pulses",
+  crop == "Field Pea" ~ "Pulses",
+  crop == "Lupin" ~     "Pulses",
+  crop == "Lentil" ~    "Pulses",
+  TRUE ~ crop
+))
+
+unique(NVT_all$crop)
+
+NVT_all$crop <- factor(NVT_all$crop, 
+                          levels = c("Wheat", "Barley", "Oat","Canola", 
+                                     "Pulses" ,
+                                     "Sorghum" ,
+                                     "Triticale"
+                          ))
+
+
+
+
 ################################################################################
 ## the first year range means it was sown in that year and then either harvested that year or early the following year
 
@@ -108,8 +133,6 @@ NVT_all <- NVT_all %>%  mutate(Grouping_years =
   Year_season == "2019-2020" ~ "Current study",
   Year_season == "2020-2021" ~ "Current study",
   
-  Year_season == "2021-2022" ~ "Most recent years",
-  Year_season == "2022-2023" ~ "Most recent years",
   
   TRUE                      ~ "other"
   ))
@@ -126,7 +149,7 @@ unique(NVT_with_duplication$crop)
 
 NVT_with_duplication$crop <- factor(NVT_with_duplication$crop, 
                                     levels = c("Wheat", "Barley", "Oat","Canola", 
-                                               "Chickpea","Field Pea","Lupin" , "Lentil","Faba Bean",
+                                               "Pulses" ,
                                                "Sorghum" ,
                                                "Triticale"
                                                ))
@@ -142,7 +165,7 @@ summary_df <- NVT_with_duplication %>%
   group_by(Grouping_years, AEZ, crop) %>% 
   summarize(m=mean(yield))
 summary_df <- ungroup(summary_df)
-summary_df_test <- summary_df %>%  filter(crop == "Wheat")
+
 ################################################################################
 ### wheat #####################################################################
 crop_type <- "wheat"
@@ -164,8 +187,8 @@ plot1<-
   ) +
   ylim(1, 12)+
   stat_summary(fun.y=mean, geom="point", shape=20, size=2, color="black", fill="black") +
-  labs(x = "grouping of year", y = "Yield t/ha", fill = "")+
-  labs(title = crop_type)+
+  labs(x = "", y = "Yield t/ha", fill = "")+
+  labs(title = paste0("NVT yield for: ",  crop_type))+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
   facet_wrap(.~AEZ)
 
@@ -173,6 +196,181 @@ plot1 + geom_text(
   data    = summary_df_crop_type,
   mapping = aes(x = Grouping_years, y = 12, label = round(m, 2)),size=3)
 
+ggsave(
+  device = "png",
+  filename = paste0("NVT_",   crop_type,".png"),
+  path= "W:/Economic impact of weeds round 2/NVT/jaxs processing/plots/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+) 
+################################################################################
+### Oat #####################################################################
+crop_type <- "Oat"
+unique(summary_df$crop)
+summary_df_crop_type <- summary_df %>%  filter(crop == "Oat")
 
-  
-  
+plot1<-
+  NVT_with_duplication %>%  
+  filter(crop=="Oat") %>% 
+  filter(Grouping_years != "other") %>% 
+  filter(crop != "Triticale") %>% 
+  ggplot( mapping = aes(x = Grouping_years, 
+                        y = yield ,
+                        #group = name,
+                        fill=Grouping_years)) +
+  theme_bw()+
+  geom_boxplot(outlier.shape = NA,
+               #alpha = 0.2
+  ) +
+  ylim(1, 12)+
+  stat_summary(fun.y=mean, geom="point", shape=20, size=2, color="black", fill="black") +
+  labs(x = "", y = "Yield t/ha", fill = "")+
+  labs(title = paste0("NVT yield for: ",   crop_type))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(.~AEZ)
+
+plot1 + geom_text(
+  data    = summary_df_crop_type,
+  mapping = aes(x = Grouping_years, y = 12, label = round(m, 2)),size=3)
+
+ggsave(
+  device = "png",
+  filename = paste0("NVT_",   crop_type,".png"),
+  path= "W:/Economic impact of weeds round 2/NVT/jaxs processing/plots/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)   
+
+################################################################################
+### Barley #####################################################################
+
+crop_type <- "Barley"
+unique(summary_df$crop)
+summary_df_crop_type <- summary_df %>%  filter(crop == "Barley")
+
+plot1<-
+  NVT_with_duplication %>%  
+  filter(crop=="Barley") %>% 
+  filter(Grouping_years != "other") %>% 
+  filter(crop != "Triticale") %>% 
+  ggplot( mapping = aes(x = Grouping_years, 
+                        y = yield ,
+                        #group = name,
+                        fill=Grouping_years)) +
+  theme_bw()+
+  geom_boxplot(outlier.shape = NA,
+               #alpha = 0.2
+  ) +
+  ylim(1, 12)+
+  stat_summary(fun.y=mean, geom="point", shape=20, size=2, color="black", fill="black") +
+  labs(x = "", y = "Yield t/ha", fill = "")+
+  labs(title = paste0("NVT yield for: ",   crop_type))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(.~AEZ)
+
+plot1 + geom_text(
+  data    = summary_df_crop_type,
+  mapping = aes(x = Grouping_years, y = 12, label = round(m, 2)),size=3)
+
+ggsave(
+  device = "png",
+  filename = paste0("NVT_",   crop_type,".png"),
+  path= "W:/Economic impact of weeds round 2/NVT/jaxs processing/plots/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)   
+
+################################################################################
+### Canola #####################################################################
+
+crop_type <- "Canola"
+unique(summary_df$crop)
+summary_df_crop_type <- summary_df %>%  filter(crop == "Canola")
+
+plot1<-
+  NVT_with_duplication %>%  
+  filter(crop=="Canola") %>% 
+  filter(Grouping_years != "other") %>% 
+  filter(crop != "Triticale") %>% 
+  ggplot( mapping = aes(x = Grouping_years, 
+                        y = yield ,
+                        #group = name,
+                        fill=Grouping_years)) +
+  theme_bw()+
+  geom_boxplot(outlier.shape = NA,
+               #alpha = 0.2
+  ) +
+  ylim(1, 12)+
+  stat_summary(fun.y=mean, geom="point", shape=20, size=2, color="black", fill="black") +
+  labs(x = "", y = "Yield t/ha", fill = "")+
+  labs(title = paste0("NVT yield for: ",   crop_type))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(.~AEZ)
+
+plot1 + geom_text(
+  data    = summary_df_crop_type,
+  mapping = aes(x = Grouping_years, y = 12, label = round(m, 2)),size=3)
+
+ggsave(
+  device = "png",
+  filename = paste0("NVT_",   crop_type,".png"),
+  path= "W:/Economic impact of weeds round 2/NVT/jaxs processing/plots/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)   
+
+
+################################################################################
+### Pulses (Chickpea,  Faba Bean, Field Pea, Lupin,    Lentil  #################
+
+
+crop_type <- "Pulses"
+unique(summary_df$crop)
+summary_df_crop_type <- summary_df %>%  filter(crop == "Pulses")
+
+
+
+
+
+###### something wrong with below plot with the summary file
+
+
+plot1<-
+  NVT_with_duplication %>%  
+  filter(crop=="Pulses") %>% 
+  filter(Grouping_years != "other") %>% 
+  filter(crop != "Triticale") %>% 
+  ggplot( mapping = aes(x = Grouping_years, 
+                        y = yield ,
+                        #group = name,
+                        fill=Grouping_years)) +
+  theme_bw()+
+  geom_boxplot(outlier.shape = NA,
+               #alpha = 0.2
+  ) +
+  ylim(1, 12)+
+  stat_summary(fun.y=mean, geom="point", shape=20, size=2, color="black", fill="black") +
+  labs(x = "", y = "Yield t/ha", fill = "")+
+  labs(title = paste0("NVT yield for: ",   crop_type))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(.~AEZ)
+
+plot1 + geom_text(
+  data    = summary_df_crop_type,
+  mapping = aes(x = Grouping_years, y = 12, label = round(m, 2)),size=3)
+
+ggsave(
+  device = "png",
+  filename = paste0("NVT_",   crop_type,".png"),
+  path= "W:/Economic impact of weeds round 2/NVT/jaxs processing/plots/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)   
+#################################################################################
+
+write.csv(summary_df, "W:/Economic impact of weeds round 2/NVT/jaxs processing/summary_NVT_yrs_group.csv",  row.names = FALSE)
