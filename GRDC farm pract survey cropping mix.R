@@ -143,12 +143,14 @@ winter_crops <- winter_crops %>%
     Total_winter  = "TOTAL. Total Winter crop area"    
   )
 names(winter_crops)
+#replace the na with zeros
+winter_crops <- winter_crops %>% replace(is.na(.), 0)
 
 winter_crops <- winter_crops %>% 
-  mutate(Wheat              = Bread_wheat+Durum_wheat) %>% 
-  mutate(Barley             = Feed_barley+Malt_barley) %>% 
-  mutate(Pulses             = Chickpeas+Faba_beans+Field_peas+Lupins+Lentils) %>% 
-  mutate(Other_winter_merge = Triticale+Cereal_rye+Mustard+Linola+Vetch+Other_winter)
+  mutate(Wheat              = (Bread_wheat+Durum_wheat)) %>% 
+  mutate(Barley             = (Feed_barley+Malt_barley)) %>% 
+  mutate(Pulses             = (Chickpeas+Faba_beans+Field_peas+Lupins+Lentils)) %>% 
+  mutate(Other_winter_merge = (Triticale+Cereal_rye+Mustard+Linola+Vetch+Other_winter))
 
 winter_crops <- winter_crops %>% select(
   -Bread_wheat,-Durum_wheat,
@@ -191,10 +193,11 @@ summer_crops <- summer_crops %>%
     Total_summer       = "TOTAL. Total Spring/Summer crop area"    
   )
 names(summer_crops)
-
+#replace the na with zeros
+summer_crops <- summer_crops %>% replace(is.na(.), 0)
 
 summer_crops <- summer_crops %>% 
-  mutate(Other_summer_merge= Sunflower+Corn_Maize+Soybeans+Mungbeans+Rice+Other_summer)  
+  mutate(Other_summer_merge= (Sunflower+Corn_Maize+Soybeans+Mungbeans+Rice+Other_summer))  
 summer_crops <- summer_crops %>% select(
   -Sunflower,
   -Corn_Maize,
@@ -229,6 +232,7 @@ names(fallow)
 
 #################################################################################
 crop_type_area <- GRDC_crop_mix %>%  select( `Case ID`,
+                                             AEZ,
                                    convert_ha,
                                    Q4A, Q4B, 
                                    crop_season  , 
@@ -319,3 +323,38 @@ crop_type_area <- crop_type_area %>% select(
   -Total_fallow
 )
 
+
+###############################################################################
+write.csv(crop_type_area, 
+          "W:/Economic impact of weeds round 2/GRDC_farm_practice_survey/Jackie_working/crop_type_area.csv",  
+          row.names = FALSE)
+#################################################################################
+
+################################################################################
+ 
+unique(GRDC_crop_mix$AEZ)
+str(crop_type_area)
+summary_crop_area_mix <- crop_type_area %>% group_by(AEZ) %>% 
+  summarise(
+    mean_farm_area              = mean(total_farm_area, na.rm = TRUE),
+    mean_potential_crop_ha      = mean(potential_crop_ha, na.rm = TRUE),
+    mean_Wheat_ha               = mean(Wheat_ha, na.rm = TRUE),
+    mean_Barley_ha              = mean(Barley_ha , na.rm = TRUE),
+    mean_Oats_ha                = mean(Oats_ha , na.rm = TRUE),
+    mean_Canola_ha              = mean(Canola_ha , na.rm = TRUE),
+    mean_Pulses_ha              = mean(Pulses_ha  , na.rm = TRUE),
+    mean_manured_winter_crop_ha = mean(manured_crop_ha  , na.rm = TRUE),
+    mean_Total_winter_ha        = mean(Total_winter_ha  , na.rm = TRUE),
+    
+    mean_Sorghum_ha              = mean(Sorghum_ha   , na.rm = TRUE),
+    mean_Cotton_ha               = mean(Cotton_ha   , na.rm = TRUE),
+    mean_manured_crop_summer_ha  = mean(manured_crop_summer_ha, na.rm = TRUE),
+    mean_Total_summer_ha         = mean(Total_summer_ha, na.rm = TRUE),
+    
+    mean_Short_fallowed_ha         = mean(Short_fallowed_ha, na.rm = TRUE),
+    
+  )
+
+write.csv(summary_crop_area_mix, 
+          "W:/Economic impact of weeds round 2/GRDC_farm_practice_survey/Jackie_working/summary_crop_area_mix.csv",  
+          row.names = FALSE)
