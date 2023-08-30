@@ -113,44 +113,209 @@ GRDC_crop_mix <- GRDC_crop_mix %>% mutate(potential_crop_ha = total_farm_area -p
 # Crop intended to be or already ‘green manured’ (ploughed into soil prior to maturity for weed or disease management)- 17
 # Crop intended to be or already ‘brown manured’ (sprayed out prior to maturity for weed or disease
 #                                                 management)--------------------------------------------------- 18
+
+
+
 names(GRDC_crop_mix)
-unique(GRDC_crop_mix$Q9A)
-winter_crop <- GRDC_crop_mix %>% select( `Case ID`,Q9A) 
+winter_crops <- GRDC_crop_mix %>% select(`Case ID`, `Q10_01. Bread wheat`:`TOTAL. Total Winter crop area` )
 
 
-test_winter_crops <- winter_crop %>%  
-  mutate(Bread_wheat = case_when(grepl("01", Q9A) ~ "Bread_wheat")) %>% 
-  mutate(Durum_wheat = case_when(grepl("02", Q9A) ~ "Durum_wheat")) %>%                       
-  mutate(Feed_barley = case_when(grepl("03", Q9A) ~ "Feed_barley")) %>% 
-  mutate(Malt_barley = case_when(grepl("04", Q9A) ~ "Malt_barley")) %>% 
-  mutate(Oats = case_when(grepl       ("05", Q9A) ~ "Oats")) %>% 
-  mutate(Triticale = case_when(grepl  ("06", Q9A) ~ "Triticale")) %>% 
-  mutate(Cereal_rye = case_when(grepl ("07", Q9A) ~ "Cereal_rye")) %>%
-  mutate(Canola = case_when(grepl     ("08", Q9A) ~ "Canola")) %>% 
-  mutate(Mustard = case_when(grepl    ("09", Q9A) ~ "Mustard")) %>% 
-  mutate(Linola = case_when(grepl     ("10", Q9A) ~ "Linola")) %>%
-  mutate(Chickpeas = case_when(grepl  ("11", Q9A) ~ "Chickpeas")) %>%
-  mutate(Field_peas = case_when(grepl ("12", Q9A) ~ "Field_peas")) %>%
-  mutate(Lentils = case_when(grepl    ("13", Q9A) ~ "Lentils")) %>%
-  mutate(Lupins = case_when(grepl     ("14", Q9A) ~ "Lupins")) %>%
-  mutate(Faba_beans = case_when(grepl ("15", Q9A) ~ "Faba_beans")) %>%
-  mutate(Vetch = case_when(grepl      ("16", Q9A) ~ "Vetch")) %>%
-  mutate(Other_winter_crops = case_when(grepl("19", Q9A) ~ "Other_winter_crops")) %>%
-  mutate(green_manured = case_when(grepl("17", Q9A) ~ "green_manured")) %>%
-  mutate(brown_manured = case_when(grepl("18", Q9A) ~ "brown_manured"))
-  
-### ummm not sure I need the above code
+winter_crops <- winter_crops %>% 
+  rename(
+    Bread_wheat  = "Q10_01. Bread wheat",                                                                                                                            
+    Durum_wheat  ="Q10_02. Durum wheat" ,                                                                                                                           
+    Feed_barley   = "Q10_03. Feed barley (IF DK GRADE BEST GUESS)" ,                                                                                                   
+    Malt_barley   ="Q10_04. Malt barley (IF DK GRADE BEST GUESS)" ,                                                                                                   
+    Oats          ="Q10_05. Oats" ,                                                                                                                                   
+    Triticale     ="Q10_06. Triticale" ,                                                                                                                              
+    Cereal_rye    ="Q10_07. Cereal rye" ,                                                                                                                             
+    Canola        ="Q10_08. Canola"   ,                                                                                                                               
+    Mustard       ="Q10_09. Mustard" ,                                                                                                                                
+    Linola        ="Q10_10. Linola"  ,                                                                                                                                
+    Chickpeas     ="Q10_11. Chickpeas" ,                                                                                                                              
+    Field_peas    ="Q10_12. Field peas" ,                                                                                                                             
+    Lentils       ="Q10_13. Lentils" ,                                                                                                                                
+    Lupins        ="Q10_14. Lupins" ,                                                                                                                                 
+    Faba_beans    ="Q10_15. Faba beans"  ,                                                                                                                            
+    Vetch         ="Q10_16. Vetch" ,                                                                                                                                  
+    manured_crop  ="Q10_17. Crop intended to be or already green/brown manured´ (ploughed into soil or sprayed out prior to maturity for weed or disease management)",
+    Other_winter  ="Q10_19. Other Winter crops"   ,                                                                                                                   
+    Total_winter  = "TOTAL. Total Winter crop area"    
+  )
+names(winter_crops)
 
-test_winter_crops_v2 <- GRDC_crop_mix %>% select(`Case ID`, `Q10_01. Bread wheat`:`TOTAL. Total Winter crop area` )
+winter_crops <- winter_crops %>% 
+  mutate(Wheat              = Bread_wheat+Durum_wheat) %>% 
+  mutate(Barley             = Feed_barley+Malt_barley) %>% 
+  mutate(Pulses             = Chickpeas+Faba_beans+Field_peas+Lupins+Lentils) %>% 
+  mutate(Other_winter_merge = Triticale+Cereal_rye+Mustard+Linola+Vetch+Other_winter)
+
+winter_crops <- winter_crops %>% select(
+  -Bread_wheat,-Durum_wheat,
+  -Feed_barley, -Malt_barley,
+  -Chickpeas, -Faba_beans, -Field_peas, -Lupins, -Lentils,
+  -Triticale, -Cereal_rye, -Mustard, -Linola, -Vetch, -Other_winter)
 
 
-### up to here ####
+#######################################################################################################
+#### Crop Type Summer
+# 9B)What spring or summer crops did you plant in the 2020-21 season
+# Summer crops:
+#   Sunflower ---------------------------------------------------------------------------------------------------- 20
+# Sorghum ----------------------------------------------------------------------------------------------------- 21
+# Corn or Maize ------------------------------------------------------------------------------------------------ 22
+# Soybeans ---------------------------------------------------------------------------------------------------- 23
+# Mungbeans --------------------------------------------------------------------------------------------------- 24
+# Cotton -------------------------------------------------------------------------------------------------------- 25
+# Rice ----------------------------------------------------------------------------------------------------------- 26
+# Other summer crops ---------------------------------------------------------------------------------------- 27
+# Crop intended to be or already ‘green manured’ (ploughed into soil prior to maturity for weed ordisease management) -------------------------------------------------------------------------------------- 17
+# Crop intended to be or already ‘brown manured’ (sprayed out prior to maturity for weed or disease
+#                                                 management) -----------------------------------------------------------------------------------------------
+
+names(GRDC_crop_mix)
+summer_crops <- GRDC_crop_mix %>% select(`Case ID`, `Q10_Sunflower`:`TOTAL. Total Spring/Summer crop area` )
+names(summer_crops)
+
+summer_crops <- summer_crops %>% 
+  rename(
+    Sunflower          = "Q10_Sunflower",                                                                                                                            
+    Sorghum            ="Q10_Sorghum" ,                                                                                                                           
+    Corn_Maize         = "Q10_Corn or Maize" ,                                                                                                   
+    Soybeans           ="Q10_Soybeans" ,                                                                                                   
+    Mungbeans          ="Q10_Mungbeans" ,                                                                                                                                   
+    Cotton             ="Q10_Cotton" ,                                                                                                                              
+    Rice               ="Q10_Rice" ,                                                                                                                             
+    manured_crop        ="Q10_18. Crop intended to be or already green/brown manured´ (ploughed into soil or sprayed out prior to maturity for weed or disease management)"   ,                                                                                                                               
+    Other_summer       ="Q10_27. Other Spring/ Summer crops" ,                                                                                                                                
+    Total_summer       = "TOTAL. Total Spring/Summer crop area"    
+  )
+names(summer_crops)
+
+
+summer_crops <- summer_crops %>% 
+  mutate(Other_summer_merge= Sunflower+Corn_Maize+Soybeans+Mungbeans+Rice+Other_summer)  
+summer_crops <- summer_crops %>% select(
+  -Sunflower,
+  -Corn_Maize,
+  -Soybeans,
+  -Mungbeans,
+  -Rice,
+  -Other_summer)
+
+
+
+#######################################################################################################
+#### Fallow
+# Q14. Over the past 12 months, how many (hectares/acres) have been … read out? (MR)
+# A.Long fallowed_________
+# B.Short fallowed_________
+
+names(GRDC_crop_mix)
+fallow <- GRDC_crop_mix %>% select(`Case ID`, `Q14. Long fallowed`:`Q14_Total` )
+names(fallow)
+
+fallow <- fallow %>% 
+  rename(
+    Long_fallowed          = "Q14. Long fallowed",                                                                                                                            
+    Short_fallowed         = "Q14. Short fallowed" ,                                                                                                                           
+    Total_fallow           = "Q14_Total"   
+  )
+names(fallow)
+
+
 
 
 
 #################################################################################
-test <- GRDC_crop_mix %>%  select( `Case ID`, 
+crop_type_area <- GRDC_crop_mix %>%  select( `Case ID`,
+                                   convert_ha,
                                    Q4A, Q4B, 
                                    crop_season  , 
                                    total_farm_area, double_cropped, double_cropped_ha, 
                                    pasture_veg_plan_cropped_ha,potential_crop_ha )
+
+names(crop_type_area)
+crop_type_area <- crop_type_area %>% 
+  rename(winter_crop = Q4A, 
+         summer_crop = Q4B)
+crop_type_area <- crop_type_area %>% 
+  mutate(winter_crop_ha = winter_crop*convert_ha, 
+         summer_crop_ha = summer_crop*convert_ha)
+
+crop_type_area <- crop_type_area %>% select(-winter_crop, -summer_crop)
+
+
+###############################################################################
+##add the winter crops and convert to ha
+
+crop_type_area <- left_join(crop_type_area, winter_crops)
+names(crop_type_area)
+crop_type_area <- crop_type_area %>% 
+  mutate(Wheat_ha = Wheat*convert_ha, 
+         Barley_ha = Barley*convert_ha,
+         Oats_ha = Oats*convert_ha,
+         Canola_ha = Canola*convert_ha,
+         Pulses_ha = Pulses*convert_ha,
+         manured_crop_ha = manured_crop*convert_ha,
+         Other_winter_merge_ha = Other_winter_merge*convert_ha,
+         Total_winter_ha = Total_winter*convert_ha)
+         
+         
+crop_type_area <- crop_type_area %>% select(
+  -Wheat,
+  -Barley,
+  -Oats,
+  -Canola,
+  -Pulses,
+  -manured_crop,
+  -Other_winter_merge,
+  -Total_winter
+  )
+
+         
+###############################################################################
+##add the summer crops and convert to ha
+
+crop_type_area <- left_join(crop_type_area, summer_crops)
+names(crop_type_area)
+crop_type_area <- crop_type_area %>% 
+  mutate(Sorghum_ha = Sorghum*convert_ha, 
+         Cotton_ha = Cotton*convert_ha,
+         manured_crop_summer_ha = manured_crop*convert_ha,
+         Other_summer_merge_ha = Other_summer_merge*convert_ha,
+         Total_summer_ha = Total_summer*convert_ha,)
+
+
+crop_type_area <- crop_type_area %>% select(
+  -Sorghum,
+  -Cotton,
+  -manured_crop,
+  -Other_summer_merge,
+  -Total_summer
+)
+
+
+###############################################################################
+##add the fallow and convert to ha
+
+crop_type_area <- left_join(crop_type_area, fallow)
+names(crop_type_area)
+str(crop_type_area)
+
+crop_type_area$Long_fallowed <- as.double(crop_type_area$Long_fallowed) #DK is in clm - recoded here to NA
+crop_type_area$Short_fallowed <- as.double(crop_type_area$Short_fallowed)
+
+
+crop_type_area <- crop_type_area %>% 
+  mutate(Short_fallowed_ha = Short_fallowed*convert_ha, 
+         Long_fallowed_ha = Long_fallowed*convert_ha,
+         Total_fallow_ha = Total_fallow*convert_ha)
+
+
+crop_type_area <- crop_type_area %>% select(
+  -Short_fallowed,
+  -Long_fallowed,
+  -Total_fallow
+)
+
