@@ -68,6 +68,16 @@ GRDC_crop_mix <- GRDC_crop_mix %>% mutate(crop_season = case_when(
 names(GRDC_crop_mix)
 unique(GRDC_crop_mix$crop_season)
 
+
+
+GRDC_crop_mix <- GRDC_crop_mix %>% rename(winter_crop_area = Q4A,
+                                          summer_crop_area = Q4B)
+
+
+GRDC_crop_mix <- GRDC_crop_mix %>% mutate(winter_crop_area_ha = winter_crop_area * convert_ha,
+                                          summer_crop_area_ha = summer_crop_area * convert_ha )
+
+
 # Q5. Has any crop area been double cropped during 2021?
 #   Yes ........................................................................................................ 1 continue
 # No ......................................................................................................... 2 go to Q7
@@ -231,23 +241,19 @@ names(fallow)
 
 
 #################################################################################
+
+names(GRDC_crop_mix)
+
 crop_type_area <- GRDC_crop_mix %>%  select( `Case ID`,
                                              AEZ,
+                                             
                                    convert_ha,
-                                   Q4A, Q4B, 
+                                   winter_crop_area_ha , summer_crop_area_ha,
                                    crop_season  , 
                                    total_farm_area, double_cropped, double_cropped_ha, 
                                    pasture_veg_plan_cropped_ha,potential_crop_ha )
 
 names(crop_type_area)
-crop_type_area <- crop_type_area %>% 
-  rename(winter_crop = Q4A, 
-         summer_crop = Q4B)
-crop_type_area <- crop_type_area %>% 
-  mutate(winter_crop_ha = winter_crop*convert_ha, 
-         summer_crop_ha = summer_crop*convert_ha)
-
-crop_type_area <- crop_type_area %>% select(-winter_crop, -summer_crop)
 
 
 ###############################################################################
@@ -323,21 +329,63 @@ crop_type_area <- crop_type_area %>% select(
   -Total_fallow
 )
 
+names(crop_type_area)
+
+crop_type_area <- crop_type_area %>% 
+  mutate(winter_summer_crop_area_ha = winter_crop_area_ha+summer_crop_area_ha )
+crop_type_area <- crop_type_area %>% 
+  mutate(winter_summer_crop_double_area_ha = winter_crop_area_ha+summer_crop_area_ha+double_cropped_ha )
+
+crop_type_area <- crop_type_area %>% select(
+  `Case ID` ,
+  AEZ,
+  crop_season,
+  double_cropped,
+  winter_crop_area_ha,
+  summer_crop_area_ha,
+  double_cropped_ha,
+  total_farm_area,
+  potential_crop_ha:winter_summer_crop_double_area_ha)
+  
+str(crop_type_area)
+
+
+
 
 ###############################################################################
 write.csv(crop_type_area, 
           "W:/Economic impact of weeds round 2/GRDC_farm_practice_survey/Jackie_working/crop_type_area.csv",  
           row.names = FALSE)
 #################################################################################
-
+rm(fallow, summer_crops, winter_crops)
 ################################################################################
  
-unique(GRDC_crop_mix$AEZ)
+unique(crop_type_area$AEZ)
 str(crop_type_area)
+dim(crop_type_area)
+#### before I make a summary I need to change 0 back to na
+
+crop_type_area <- na_if(crop_type_area, 0)
+names(crop_type_area)       
+
+################################################################################
+unique(crop_type_area$AEZ)
+###############################################################################
+## add in national
+
+crop_type_area_national <- crop_type_area
+crop_type_area_national <- crop_type_area_national %>% mutate(AEZ = "national")
+
+crop_type_area <- rbind(crop_type_area,crop_type_area_national )
+
+
 summary_crop_area_mix <- crop_type_area %>% group_by(AEZ) %>% 
   summarise(
     mean_farm_area              = mean(total_farm_area, na.rm = TRUE),
     mean_potential_crop_ha      = mean(potential_crop_ha, na.rm = TRUE),
+    mean_winter_summer_crop_area_ha             = mean(winter_summer_crop_area_ha, na.rm = TRUE),
+    mean_winter_summer_crop_double_area_ha      = mean(winter_summer_crop_double_area_ha, na.rm = TRUE),
+    
     mean_Wheat_ha               = mean(Wheat_ha, na.rm = TRUE),
     mean_Barley_ha              = mean(Barley_ha , na.rm = TRUE),
     mean_Oats_ha                = mean(Oats_ha , na.rm = TRUE),
@@ -357,4 +405,115 @@ summary_crop_area_mix <- crop_type_area %>% group_by(AEZ) %>%
 
 write.csv(summary_crop_area_mix, 
           "W:/Economic impact of weeds round 2/GRDC_farm_practice_survey/Jackie_working/summary_crop_area_mix.csv",  
+          row.names = FALSE)
+
+
+
+summary_crop_area_mix_sum <- crop_type_area %>% group_by(AEZ) %>% 
+  summarise(
+    sum_farm_area              = sum(total_farm_area, na.rm = TRUE),
+    sum_potential_crop_ha      = sum(potential_crop_ha, na.rm = TRUE),
+    sum_winter_summer_crop_area_ha             = sum(winter_summer_crop_area_ha, na.rm = TRUE),
+    sum_winter_summer_crop_double_area_ha      = sum(winter_summer_crop_double_area_ha, na.rm = TRUE),
+    
+    sum_Wheat_ha               = sum(Wheat_ha, na.rm = TRUE),
+    sum_Barley_ha              = sum(Barley_ha , na.rm = TRUE),
+    sum_Oats_ha                = sum(Oats_ha , na.rm = TRUE),
+    sum_Canola_ha              = sum(Canola_ha , na.rm = TRUE),
+    sum_Pulses_ha              = sum(Pulses_ha  , na.rm = TRUE),
+    sum_manured_winter_crop_ha = sum(manured_crop_ha  , na.rm = TRUE),
+    sum_Total_winter_ha        = sum(Total_winter_ha  , na.rm = TRUE),
+    
+    sum_Sorghum_ha              = sum(Sorghum_ha   , na.rm = TRUE),
+    sum_Cotton_ha               = sum(Cotton_ha   , na.rm = TRUE),
+    sum_manured_crop_summer_ha  = sum(manured_crop_summer_ha, na.rm = TRUE),
+    sum_Total_summer_ha         = sum(Total_summer_ha, na.rm = TRUE),
+    
+    sum_Short_fallowed_ha         = sum(Short_fallowed_ha, na.rm = TRUE),
+    count = n()
+    
+  )
+
+
+
+
+write.csv(summary_crop_area_mix_sum, 
+          "W:/Economic impact of weeds round 2/GRDC_farm_practice_survey/Jackie_working/summary_crop_area_mix_sum.csv",  
+          row.names = FALSE)
+
+
+
+################################################################################
+### Not really sure how best to get the av crop area but still get the cropping land to equal the sum of all the crops
+
+#### The GRDC report groups the crops and reports on the average % of crop land for the crops.
+### I cant use this because I need more detail eg cotton alone.
+### but I could use this approach 
+### first sum all the area of each crop type per AEZ as per df = summary_crop_area_mix_sum
+### then work out the % of land sown to this crop type.
+### then use the avearge cropping land to work out the ha - this is quite good becasue I can fiddle with the average and the % won't change.
+################################################################################
+
+## get % of crop type 
+
+str(summary_crop_area_mix_sum)
+
+summary_crop_area_mix_percent <- summary_crop_area_mix_sum %>% 
+  mutate(percent_wheat =   (sum_Wheat_ha / sum_winter_summer_crop_area_ha)*100,
+         percent_Barley =  (sum_Barley_ha / sum_winter_summer_crop_area_ha)*100,
+         percent_Oats =    (sum_Oats_ha / sum_winter_summer_crop_area_ha)*100,
+         percent_Canola = (sum_Canola_ha / sum_winter_summer_crop_area_ha)*100,
+         percent_Pulses = (sum_Pulses_ha / sum_winter_summer_crop_area_ha)*100,
+         percent_manured_winter = (sum_manured_winter_crop_ha/ sum_winter_summer_crop_area_ha)*100,
+         percent_Sorghum = (sum_Sorghum_ha / sum_winter_summer_crop_area_ha)*100,
+         percent_Cotton = (sum_Cotton_ha  / sum_winter_summer_crop_area_ha)*100,
+         percent_manured_summer = (sum_manured_crop_summer_ha / sum_winter_summer_crop_area_ha)*100
+         )
+
+names(summary_crop_area_mix_percent)
+summary_crop_area_mix_percent <- summary_crop_area_mix_percent %>%  select(AEZ,
+                         percent_wheat:percent_manured_summer)
+
+### add in the average
+str(summary_crop_area_mix)
+crop_area_av_AEZ_subset <- summary_crop_area_mix %>%  select(AEZ, mean_winter_summer_crop_area_ha)
+str(summary_crop_area_mix_percent)
+
+summary_crop_area_mix_percent <- left_join(crop_area_av_AEZ_subset,summary_crop_area_mix_percent )
+
+##### cal the ha based on av cropping land and the percenatage grown in each AEZ 
+
+Crop_area_final <- summary_crop_area_mix_percent %>% 
+  mutate(
+         Wheat = mean_winter_summer_crop_area_ha*(percent_wheat/100),
+         Barley = mean_winter_summer_crop_area_ha*(percent_Barley/100),
+         Oats = mean_winter_summer_crop_area_ha*(percent_Oats/100),
+         Canola = mean_winter_summer_crop_area_ha*(percent_Canola/100),
+         Pulses = mean_winter_summer_crop_area_ha*(percent_Pulses/100),
+         Manured_winter = mean_winter_summer_crop_area_ha*(percent_manured_winter/100),
+         Sorghum = mean_winter_summer_crop_area_ha*(percent_Sorghum/100),
+         Cotton = mean_winter_summer_crop_area_ha*(percent_Cotton/100),
+         Manured_summer = mean_winter_summer_crop_area_ha*(percent_manured_summer/100))
+         
+Crop_area_final <- Crop_area_final %>% select(AEZ,mean_winter_summer_crop_area_ha, Wheat:Manured_summer)
+
+
+
+
+write.csv(Crop_area_final, 
+          "W:/Economic impact of weeds round 2/GRDC_farm_practice_survey/Jackie_working/Crop_area_final.csv",  
+          row.names = FALSE)
+
+
+
+#################################################################################
+### report on the weight factors per AEZ
+
+names(GRDC_crop_mix)
+unique(GRDC_crop_mix$`weight factor`)
+wt_factor <- GRDC_crop_mix %>% group_by(`State (Primary Location) (Location)`) %>% 
+  summarise(min_wt_factor = min(`weight factor`, na.rm=TRUE),
+            max_wt_factor = max(`weight factor`, na.rm=TRUE ))
+write.csv(wt_factor, 
+          "W:/Economic impact of weeds round 2/GRDC_farm_practice_survey/Jackie_working/wt_factor_by_state.csv",  
           row.names = FALSE)
