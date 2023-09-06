@@ -13,10 +13,10 @@ library(DT)
 ################################################################################
 
 
-HR_weed_list_NSW <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates.xlsx", 
+HR_weed_list_NSW <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates_with_crop.xlsx", 
                                                      sheet = "NSW")
 
-HR_weed_list_Tas <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates.xlsx", 
+HR_weed_list_Tas <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed Species locations no co-ordinates_with_crop.xlsx", 
                                 sheet = "Tas")
 
 
@@ -117,6 +117,19 @@ list_of_weed_AEZ <- ungroup(list_of_weed_AEZ)
 str(list_of_weed_AEZ)
 
 write.csv(list_of_weed_AEZ, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/list_of_weed_AEZ.csv", row.names = FALSE)
+
+### make a list of weeds per zone and crop
+str(HR_weed_list_long_remove_na)
+
+list_of_weed_AEZ_crop <- HR_weed_list_long_remove_na %>% 
+  group_by(AEZ, Crop) %>% 
+  distinct(weed, .keep_all = TRUE) %>% 
+  select(AEZ, weed, Crop)
+
+list_of_weed_AEZ_crop <- ungroup(list_of_weed_AEZ_crop)
+str(list_of_weed_AEZ_crop)
+
+write.csv(list_of_weed_AEZ_crop, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/list_of_weed_AEZ_crop.csv", row.names = FALSE)
 
 
 
