@@ -105,6 +105,62 @@ HR_weed_list_long <- HR_weed_list_long %>% filter(  AEZ ==  "NSW NW Qld SW" |
 HR_weed_list_long_remove_na <- HR_weed_list_long %>% filter(!is.na(weed_class))
 #rm(HR_weed_list_long, HR_weed_list)
 ################################################################################
+### Recode crop into groups and drop hort crops
+
+unique(HR_weed_list_long_remove_na$Crop)
+HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>% 
+  mutate(crop_grouping = case_when(
+    Crop == "Wheat" |
+      Crop == "US Wheat"|
+      Crop == "Barley"|
+      Crop == "US Barley"|
+      Crop == "oats"|
+      Crop == "Oats"|
+      Crop == "Oaten Hay" ~ "Cereals",
+    
+    Crop == "Canola" |
+      Crop == "Lucerne" | 
+      Crop == "Triticale" | 
+      Crop == "Chick Peas" |
+      Crop == "Chickpea" |
+      Crop == "Chick peas" |
+      Crop == "Faba beans" |
+      Crop == "Field peas" |
+      Crop == "Broad beans" |
+      Crop == "Albus Lupins" |
+      Crop == "Albus lupins" |
+      Crop == "Peas" |
+      Crop == "Lupins" |
+      Crop == "Lentils" |
+      Crop == "Lupins _narrow" |
+      Crop == "Lupins_Albus" |
+      Crop == "Lupins_narrow" |
+      Crop == "Lupins/ wheat" |
+      Crop == "Freezer Peas" | 
+      Crop == "Linseed" | 
+      Crop == "Lupins/ wheat" ~ "Broadleaf",
+    
+    Crop == "Fallow" |
+      Crop == "Pasture" | 
+      Crop == "Annual pasture" | 
+      Crop == "Annual Pasture" |
+      Crop == "Perennial pasture" |
+      Crop == "Perennial Pasture" ~ "Fallow", 
+    TRUE                      ~ "other"
+  ))
+
+
+
+## need to check that some of these crops are coded correctly
+##Triticale, Freezer Peas, Linseed, Lucerne, Oaten Hay
+## what about grouping pasture with fallow is this ok?
+
+unique(HR_weed_list_long_remove_na$crop_grouping)
+check_what_coded_other<- HR_weed_list_long_remove_na %>% filter(crop_grouping == "other")
+check_what_coded_Broadleaf<- HR_weed_list_long_remove_na %>% filter(crop_grouping == "Broadleaf")
+
+rm(check_what_coded_other, check_what_coded_Broadleaf)
+################################################################################
 ### make a list of weeds per zone
 str(HR_weed_list_long_remove_na)
 
