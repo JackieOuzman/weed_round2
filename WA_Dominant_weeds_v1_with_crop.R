@@ -42,6 +42,7 @@ HR_weed_list_WA <- HR_weed_list_WA %>%  rename(AEZ = GRDC_AEZ,
                                                silver_grass = `silver grass density`,
                                                thistle = `thistle density`)
                                                
+
                                                
 
 HR_weed_list_WA_long <- pivot_longer(HR_weed_list_WA,
@@ -70,6 +71,7 @@ HR_weed_list_WA_long <-HR_weed_list_WA_long %>%
       weed_class =="High" ~ "4",
       weed_class =="V High" ~ "5",
       weed_class =="4" ~ "4",
+      weed_class == "N" ~ NA_character_,
       TRUE ~ weed_class
     )
   )
@@ -87,7 +89,7 @@ HR_weed_list_WA_long <- HR_weed_list_WA_long %>% filter(  AEZ ==  "WA Central" |
 
 
 ## remove all the rows with missing weeds
-HR_weed_list_long_remove_na <- HR_weed_list_WA_long %>% filter(!is.na(weed_class))
+HR_weed_list_long_remove_na <- HR_weed_list_WA_long %>% filter(!is.na(weed_class_code))
 #rm(HR_weed_list_long, HR_weed_list)
 ################################################################################
 ### Recode crop into groups and drop hort crops
@@ -155,8 +157,7 @@ HR_weed_list_WA_long <- HR_weed_list_WA_long %>%
 
 
 ## need to check that some of these crops are coded correctly
-##Triticale, Freezer Peas, Linseed, Lucerne, Oaten Hay
-## what about grouping pasture with fallow is this ok?
+
 
 unique(HR_weed_list_long_remove_na$crop_grouping)
 check_what_coded_other<- HR_weed_list_long_remove_na %>% filter(crop_grouping == "other")
@@ -386,23 +387,23 @@ rm(rank_density_mode, rank1_2)
 ## All years to get weed list ranking ###
 ################################################################################
 ################################################################################
-rm(list=ls()[! ls() %in% c("HR_weed_list_long","HR_weed_list_long_remove_na")])
+rm(list=ls()[! ls() %in% c("HR_weed_list_WA_long","HR_weed_list_long_remove_na")])
 
-str(HR_weed_list_long)
+str(HR_weed_list_WA_long)
 str(HR_weed_list_long_remove_na)
 
 ### make a new sample ID that includes the year.
 
-HR_weed_list_WA_long <- HR_weed_list_WA_long %>% mutate(Sampl_ID_Yr = paste0(Sample,"_", Year))
-HR_weed_list_WA_long_remove_na <- HR_weed_list_WA_long_remove_na %>% mutate(Sampl_ID_Yr = paste0(Sample,"_", Year))
+# HR_weed_list_WA_long <- HR_weed_list_WA_long %>% mutate(Sampl_ID_Yr = paste0(`sample x year`,"_", Year))
+# HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>% mutate(Sampl_ID_Yr = paste0(`sample x year`,"_", Year))
 
-paddock_per_AEZ_crop <- HR_weed_list_WA_long %>%  count(ID_Jaxs, AEZ, crop_grouping) %>%  select (ID_Jaxs, AEZ, crop_grouping) #This is just a list of paddock
+paddock_per_AEZ_crop <- HR_weed_list_WA_long %>%  count(`sample x year`, AEZ, crop_grouping) %>%  select (`sample x year`, AEZ, crop_grouping) #This is just a list of paddock
 paddock_per_AEZ_1_crop <- paddock_per_AEZ_crop %>% count(AEZ, crop_grouping)
   
 paddock_per_AEZ_1_crop <-paddock_per_AEZ_1_crop %>%  rename(`count of paddocks` = n)
 ################################################################################
 #count the number of weed occurrence per AEZ, weed   
-AEZ_weeds_count_crop <- HR_weed_list_WA_long_remove_na %>% count(AEZ, crop_grouping, weed, sort = TRUE)    
+AEZ_weeds_count_crop <- HR_weed_list_long_remove_na %>% count(AEZ, crop_grouping, weed, sort = TRUE)    
 AEZ_weeds_count_crop <- AEZ_weeds_count_crop %>%  arrange(AEZ, crop_grouping, weed)
 str(AEZ_weeds_count_crop) 
 AEZ_weeds_count_crop <- AEZ_weeds_count_crop %>%  rename(count = n)
@@ -457,7 +458,7 @@ write.csv(top4weeds_crop, "W:/Economic impact of weeds round 2/HR/Jackie_working
 #Addd ranking to the long list of weeds
 
 rank1_2_crop <- top4weeds_crop %>% filter(rank == 1 | rank==2) 
-rank_crop <- left_join(HR_weed_list_WA_long_remove_na, rank1_2_crop)
+rank_crop <- left_join(HR_weed_list_long_remove_na, rank1_2_crop)
 ## remove all the rows with missing weeds
 rank_crop <- rank_crop %>% filter(!is.na(rank))
 str(rank_crop)
