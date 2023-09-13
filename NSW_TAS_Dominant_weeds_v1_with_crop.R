@@ -116,11 +116,12 @@ HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>%
       Crop == "US Barley"|
       Crop == "oats"|
       Crop == "Oats"|
-      Crop == "Oaten Hay" ~ "Cereals",
+      Crop == "Triticale" ~ "Cereals",
+      
     
-    Crop == "Canola" |
-      Crop == "Lucerne" | 
-      Crop == "Triticale" | 
+      Crop == "Canola" |
+      
+     
       Crop == "Chick Peas" |
       Crop == "Chickpea" |
       Crop == "Chick peas" |
@@ -140,12 +141,15 @@ HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>%
       Crop == "Linseed" | 
       Crop == "Lupins/ wheat" ~ "Broadleaf",
     
-    Crop == "Fallow" |
+    
       Crop == "Pasture" | 
       Crop == "Annual pasture" | 
       Crop == "Annual Pasture" |
       Crop == "Perennial pasture" |
-      Crop == "Perennial Pasture" ~ "Fallow", 
+      Crop == "Lucerne" |
+      Crop == "Perennial Pasture" ~ "Pasture",  
+    
+      Crop == "Fallow"  ~ "Fallow", 
     TRUE                      ~ "other"
   ))
 
@@ -159,11 +163,9 @@ HR_weed_list_long <- HR_weed_list_long %>%
       Crop == "US Barley"|
       Crop == "oats"|
       Crop == "Oats"|
-      Crop == "Oaten Hay" ~ "Cereals",
+      Crop == "Triticale" ~ "Cereals",
     
-    Crop == "Canola" |
-      Crop == "Lucerne" | 
-      Crop == "Triticale" | 
+      Crop == "Canola" |
       Crop == "Chick Peas" |
       Crop == "Chickpea" |
       Crop == "Chick peas" |
@@ -183,12 +185,15 @@ HR_weed_list_long <- HR_weed_list_long %>%
       Crop == "Linseed" | 
       Crop == "Lupins/ wheat" ~ "Broadleaf",
     
-    Crop == "Fallow" |
-      Crop == "Pasture" | 
+    
+    Crop == "Pasture" | 
       Crop == "Annual pasture" | 
       Crop == "Annual Pasture" |
       Crop == "Perennial pasture" |
-      Crop == "Perennial Pasture" ~ "Fallow", 
+      Crop == "Lucerne" |
+      Crop == "Perennial Pasture" ~ "Pasture",  
+    
+    Crop == "Fallow"  ~ "Fallow", 
     TRUE                      ~ "other"
   ))
 
