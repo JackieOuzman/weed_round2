@@ -105,9 +105,9 @@ HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>%
       Crop == "oats/barley"|
       Crop == "oats"|
       Crop == "barley/oat (undersown medic0"|
-      Crop == "wheta"|
-      Crop == "oats/lupin"|
-      Crop == "Oaten Hay" ~ "Cereals",
+      Crop == "wheta" ~ "Cereals",
+      #Crop == "oats/lupin"|
+      #Crop == "Oaten Hay"
     
     Crop == "canola" |
       Crop == "CHICK pea" | 
@@ -118,7 +118,7 @@ HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>%
       Crop == "lupin" |
       Crop == "lupins"  ~ "Broadleaf",
     
-    Crop == "pasture"  ~ "Fallow", 
+    Crop == "pasture"  ~ "Pasture", 
     TRUE                      ~ "other"
   ))
 
@@ -137,9 +137,9 @@ HR_weed_list_WA_long <- HR_weed_list_WA_long %>%
       Crop == "oats/barley"|
       Crop == "oats"|
       Crop == "barley/oat (undersown medic0"|
-      Crop == "wheta"|
-      Crop == "oats/lupin"|
-      Crop == "Oaten Hay" ~ "Cereals",
+      Crop == "wheta" ~ "Cereals",
+    #Crop == "oats/lupin"|
+    #Crop == "Oaten Hay"
     
     Crop == "canola" |
       Crop == "CHICK pea" | 
@@ -150,7 +150,7 @@ HR_weed_list_WA_long <- HR_weed_list_WA_long %>%
       Crop == "lupin" |
       Crop == "lupins"  ~ "Broadleaf",
     
-    Crop == "pasture"  ~ "Fallow", 
+    Crop == "pasture"  ~ "Pasture", 
     TRUE                      ~ "other"
   ))
 
