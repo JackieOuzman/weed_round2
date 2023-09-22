@@ -859,6 +859,9 @@ rm(check_what_coded_other, check_what_coded_Broadleaf, list_crops, test)
 
 
 write.csv(HR_weed, "C:/Users/ouz001/working_from_home_post_Sep2022/weed_round2_offline/HR_weed_test.csv")
+
+
+
 ################################################################################
 ### make a list of weeds per zone and crop
 str(HR_weed)
@@ -889,11 +892,13 @@ dim(test_1)
 
 test_1 <- test_1 %>% mutate_at(c(3:44),funs(str_replace(., "OTHER", "0")))
 test_1 <- test_1 %>% mutate_at(c(3:44),funs(str_replace(., "RESIST", "1")))
-test_1 <- test_1 %>% mutate_at(c(3:44),funs(as.double(.)))
+test_1 <- test_1 %>% mutate_at(c(3:44),funs(as.double())) 
+test_1 <- test_1 %>% mutate_at(vars("Non_Selective_RYEGRASS": "Selective_and_non_Selective_FLEABANE"), as.numeric)
 
+str(test_1)
 
 summary_HR_SP_Type <- test_1 %>% 
-  group_by(AEZ, crop_grouping) %>% 
+  group_by(AEZ, crop_grouping, Species ) %>% 
   summarise(
     NS_RYEGRASS = sum(Non_Selective_RYEGRASS, na.rm = TRUE),
     S_RYEGRASS =  sum(Selective_RYEGRASS, na.rm = TRUE),
@@ -977,6 +982,8 @@ str(samples_per_AEZ_crop_group_species)
 
 test2 <- left_join(summary_HR_SP_Type_long, samples_per_AEZ_crop_group_species)
 
+
+###################################################################################
 
 
 AEZ_crop_Non_selective_HR_weeds_count <- HR_weed %>% count(AEZ, Non_Selective_Ryegrass, crop_grouping, sort = TRUE)    
