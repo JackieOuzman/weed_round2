@@ -858,7 +858,7 @@ rm(check_what_coded_other, check_what_coded_Broadleaf, list_crops, test)
 ############  Summary #########################################################
 
 
-write.csv(HR_weed, "C:/Users/ouz001/working_from_home_post_Sep2022/weed_round2_offline/HR_weed_test.csv")
+write.csv(HR_weed, "W:/Economic impact of weeds round 2/HR/Jackie_working/HR_weeds/HR_weed_step1.csv")
 
 
 
