@@ -342,6 +342,25 @@ HR_Weed_HR_Class <- HR_Weed_HR_Class %>%
   ))
 
 
+unique(HR_Weed_HR_Class$BOTH)
+
+#"RESIST"    #keep this        
+#"NOT_TESTED_NOT_TESTED"
+# "RESIST_NOT_TESTED"    
+# "SUSC_NOT_TESTED"     
+# "RESIST_SUSC"      
+# "SUSC_SUSC"            
+# "SUSC_RESIST"   
+# "NOT_TESTED_SUSC"  
+# "NOT_TESTED_RESIST"    
+
+HR_Weed_HR_Class <- HR_Weed_HR_Class %>% 
+  mutate(BOTH = case_when(
+    BOTH ==  "NOT_TESTED_NOT_TESTED" ~ "NOT_TESTED",
+    BOTH ==  "RESIST" ~ "RESIST",
+    TRUE ~ "OTHER")
+  )
+unique(HR_Weed_HR_Class$BOTH)
 
 
 write.csv(HR_Weed_HR_Class, "W:/Economic impact of weeds round 2/HR/Jackie_working/HR_weeds/HR_Weed_HR_Class_step1b.csv")
