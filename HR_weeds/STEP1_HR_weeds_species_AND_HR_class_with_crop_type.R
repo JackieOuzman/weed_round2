@@ -150,22 +150,44 @@ HR_weed <- HR_weed %>%
       Crop == "Albus lupins" |
       Crop == "lupins"  ~ "Broadleaf",
     
-    Crop == "pasture"  ~ "Pasture", 
-    Crop == "Pasture"  ~ "Pasture", 
-    Crop == "Annual pasture"  ~ "Pasture", 
-    Crop == "Perennial pasture"  ~ "Pasture", 
-    Crop == "Perennial Pasture"  ~ "Pasture", 
+    Crop == "pasture"  | 
+    Crop == "Pasture"  | 
+    Crop == "Annual pasture"  |
+      Crop == "Annual Pasture"  |
+    Crop == "Perennial pasture"  |
+    Crop == "Perennial Pasture" |
+    Crop ==   "Lucerne"|
+      Crop ==   "Pasture"|
+      Crop ==    "Clover"|
+      Crop ==    "Ryegrass"|
+      Crop ==    "Vetch"~ "Pasture",
     
     Crop == "Sorghum"  ~ "Sorghum", 
     Crop == "Fallow"  ~ "Fallow",
     
+    Crop == "Carrots"|
+      Crop == "Poppies"|
+      Crop == "Forage Rape"|
+      Crop == "Forestry"|
+      Crop == "Onions"|
+      Crop == "Potatoes"|
+      Crop == "Hay crop"|
+      Crop == "Oaten Hay"|
+      Crop == "Grape Vines"|
+      Crop == "Pyrethrum"|
+      Crop == "Poppy"|
+      Crop == "Sunflowers"|
+      Crop == "oats/lupin"|
+      Crop == "Peanut"|
+      Crop == "Millet"|
+      Crop == "Corn" ~ "non_cereal_cotton_crop",
     
     TRUE                      ~ "other"
   ))
 
 test <- HR_weed %>% filter(crop_grouping == "other") %>% distinct(Crop)
-
 test
+non_cereal_cotton_crop <- HR_weed %>% filter(crop_grouping == "non_cereal_cotton_crop") %>% distinct(Crop)
 
 ###############################################################################
 names(HR_weed)
