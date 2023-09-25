@@ -93,6 +93,112 @@ str(SELECTIVE)
 SELECTIVE <- SELECTIVE %>% filter(All_Species_selective == "RESIST")
 
 
+
+################################################################################
+## cal percentage values #####
+
+str(SELECTIVE)
+str(NON_SELECTIVE)
+str(BOTH)
+
+SELECTIVE <- SELECTIVE %>% rename(All_Species = All_Species_selective)
+SELECTIVE <- SELECTIVE %>% mutate(percenatge_weed_seed_HR = count_HR_TEST/count_Seeds_TEST*100)
+SELECTIVE$percenatge_weed_seed_HR <-round(SELECTIVE$percenatge_weed_seed_HR, 0)
+
+NON_SELECTIVE <- NON_SELECTIVE %>% rename(All_Species = All_Species_non_selective)
+NON_SELECTIVE <- NON_SELECTIVE %>% mutate(percenatge_weed_seed_HR = count_HR_TEST/count_Seeds_TEST*100)
+NON_SELECTIVE$percenatge_weed_seed_HR <-round(NON_SELECTIVE$percenatge_weed_seed_HR, 0)
+
+
+BOTH <- BOTH %>% mutate(percenatge_weed_seed_HR = count_HR_TEST/count_Seeds_TEST*100)
+BOTH$percenatge_weed_seed_HR <-round(BOTH$percenatge_weed_seed_HR, 0)
 ###############################################################################
 
-#How to join it all togther and not loose any data
+#How to join it all together and not loose any data
+
+###############################################################################
+
+crop_type <- c ("Cereals",
+           "Broadleaf",
+           "Pasture",
+           "other",
+           "Fallow",
+           "Sorghum" )
+Weeds <- c (
+  "Barley grass",
+  "Barnyard grass",
+  "Brome grass",
+  "Feathertop Rhodes grass",
+  "Fleabane",
+  "Indian hedge mustard",
+  "Liverseed grass",
+  "Phalaris",
+  "Ryegrass",
+  "Sowthistle",
+  "Wild oats",
+  "Wild radis",
+  "Wild turnip",
+  "Windmill grass"
+)
+
+Weeds <- toupper(Weeds)
+
+AEZ <- c ("NSW Central",
+              "NSW NE Qld SE",
+              "NSW NW Qld SW",
+              "NSW Vic Slopes",
+              "Qld Central",
+              "SA Mid North Lower Yorke Eyre",
+              "SA Vic Bordertown Wimmera",
+              "SA Vic Mallee",
+              "Tas Grain",
+              "Vic High Rainfall",
+              "WA Central",
+              "WA Eastern",
+              "WA Northern",
+              "WA Sandplain")
+
+
+template <- expand.grid(AEZ, crop_type, Weeds)
+#name the clms
+template <- template %>% 
+  rename(AEZ =Var1,
+         crop_grouping =Var2,
+         Species =Var3)
+
+rm(AEZ, crop_type, Weeds)
+##############################################################################
+template <- as.data.frame(template)
+
+str(template)
+str(NON_SELECTIVE)
+str(SELECTIVE)
+
+
+ALL_WEEDS <- left_join(template, NON_SELECTIVE)
+str(NON_SELECTIVE_ALL_WEEDS)
+
+ALL_WEEDS <- ALL_WEEDS %>% 
+  select(AEZ, crop_grouping, Species, percenatge_weed_seed_HR) %>% 
+  rename(perc_seed_HR_NON_SELECTIVE = percenatge_weed_seed_HR)
+
+ALL_WEEDS <- left_join(ALL_WEEDS, SELECTIVE)
+
+ALL_WEEDS <- ALL_WEEDS %>% 
+  select(AEZ, crop_grouping, Species, perc_seed_HR_NON_SELECTIVE,percenatge_weed_seed_HR) %>% 
+  rename(perc_seed_HR_SELECTIVE = percenatge_weed_seed_HR)
+str(ALL_WEEDS)
+
+## DO BOTH NOW
+ALL_WEEDS <- left_join(ALL_WEEDS, BOTH)
+str(ALL_WEEDS)
+ALL_WEEDS <- ALL_WEEDS %>% 
+  select(AEZ, crop_grouping, Species, 
+         perc_seed_HR_NON_SELECTIVE,
+         perc_seed_HR_SELECTIVE, 
+         percenatge_weed_seed_HR) %>% 
+  rename(perc_seed_HR_BOTH = percenatge_weed_seed_HR)
+str(ALL_WEEDS)
+
+
+write.csv(ALL_WEEDS, "W:/Economic impact of weeds round 2/HR/Jackie_working/HR_weeds/HR_Weed_HR_Class_Crop_type_weed_prec.csv")
