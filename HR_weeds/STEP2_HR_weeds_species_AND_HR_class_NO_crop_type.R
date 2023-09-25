@@ -17,6 +17,9 @@ HR_weed<-  read.csv("W:/Economic impact of weeds round 2/HR/Jackie_working/HR_we
 
 
 str(HR_weed)
+#filter out crop class that is  non_cereal_cotton_crop
+
+HR_weed <- HR_weed %>% filter(crop_grouping != "non_cereal_cotton_crop") 
 
 ###############################################################################
 #SELECTIVE
