@@ -13,24 +13,60 @@ library(DT)
 ################################################################################
 
 
-HR_weed_list_2020_S_NSW <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                                     sheet = "S NSW") %>% mutate(tab="S_NSW" )
-HR_weed_list_2020_N_NSW <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                       sheet = "N NSW")%>% mutate(tab="N_NSW" )
-HR_weed_list_2020_Qld <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                       sheet = "Qld")%>% mutate(tab="Qld" )
-HR_weed_list_2020_SA <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                       sheet = "SA")%>% mutate(tab="SA" )
-HR_weed_list_2020_TAs <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                       sheet = "Tas")%>% mutate(tab="Tas" )
-HR_weed_list_2020_Vic <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                       sheet = "Vic")%>% mutate(tab="Vic" )
-HR_weed_list_2020_WA <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                       sheet = "WA")%>% mutate(tab="WA" )
-HR_weed_list_2020_N_NSW_Summer <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                    sheet = "N NSW Summer")%>% mutate(tab="N_NSW_Summer" )
-HR_weed_list_2020_Qld_Summer <-  read_excel("W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx", 
-                                              sheet = "Qld Summer")%>% mutate(tab="Qld_Summer" )
+HR_weed_list_2020_S_NSW <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "S NSW"
+  ) %>% mutate(tab = "S_NSW") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_N_NSW <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "N NSW"
+  ) %>% mutate(tab = "N_NSW") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_Qld <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "Qld"
+  ) %>% mutate(tab = "Qld") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_SA <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "SA"
+  ) %>% mutate(tab = "SA") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_TAs <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "Tas"
+  ) %>% mutate(tab = "Tas") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_Vic <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "Vic"
+  ) %>% mutate(tab = "Vic") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_WA <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "WA"
+  ) %>% mutate(tab = "WA") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_N_NSW_Summer <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "N NSW Summer"
+  ) %>% mutate(tab = "N_NSW_Summer") %>%
+  filter(!is.na(Sample))
+HR_weed_list_2020_Qld_Summer <-
+  read_excel(
+    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+    sheet = "Qld Summer"
+  ) %>% mutate(tab = "Qld_Summer") %>%
+  filter(!is.na(Sample))
 
 
 ###################################################################################################################
@@ -105,7 +141,9 @@ all_states <- all_states %>%
     -"...39",
     -"...9",
     -"...12",
-    -"...67"
+    -"...67",
+    -"Species present"#,
+    #-"Waypoint" # I replaced this with Sample in the raw data
   )
 
 colnames(all_states)
@@ -132,65 +170,45 @@ rm(list = setdiff(ls(), "all_states_with_data") )
 
 
 ################################################################################
-## reday to start!
+## ready to start!
+
+str(all_states_with_data)
+
+
+
 
 
 ## Add ID to dataset so each row has a unique ID
-HR_weed_list_NSW <- HR_weed_list_NSW %>% 
+all_states_with_data <- all_states_with_data %>% 
   mutate(ID = row_number()) %>% 
-  mutate(ID_Jaxs = paste0(ID,"_NSW"))
+  mutate(ID_Jaxs = paste0(ID,"_", tab))
 
-HR_weed_list_NSW <- HR_weed_list_NSW %>% select(-ID)
-HR_weed_list_NSW <- HR_weed_list_NSW %>% select(ID_Jaxs, everything())
-## make it long NSW
-str(HR_weed_list_NSW)
-HR_weed_list_NSW <- HR_weed_list_NSW%>%  dplyr::select(ID_Jaxs:Wireweed)
-str(HR_weed_list_NSW)
-HR_weed_list_NSW <- HR_weed_list_NSW %>%  rename(AEZ = `GRDC AEZ`)
+all_states_with_data <- all_states_with_data %>% select(-ID)
+all_states_with_data <- all_states_with_data %>% select(tab, everything())
+all_states_with_data <- all_states_with_data %>% select(ID_Jaxs, everything())
+## make it long 
+colnames(all_states_with_data)
 
-HR_weed_list_NSW_long <- pivot_longer(HR_weed_list_NSW,
-                                  cols = c(`3 corner Jack`:`Wireweed`),
+
+all_states_with_data <- all_states_with_data%>%  dplyr::select(ID_Jaxs:"Ox  Tongue" )
+dim(all_states_with_data)
+all_states_with_data <- all_states_with_data %>%  rename(AEZ = `GRDC AEZ`)
+all_states_with_data[, 7:144] <- lapply(all_states_with_data[, 7:144], as.character) #Note that this step will need to be checked ie are all the weed togther and what clm they start and stop
+
+
+all_states_with_data_long <- pivot_longer(all_states_with_data,
+                                  cols = c(`Annual ryegrass`:`Ox  Tongue`),
                                   names_to = "weed",
                                   values_to="weed_class"
                                   )
 
 
-str(HR_weed_list_NSW_long)
+str(all_states_with_data_long)
 
-
-## make it long Tas
-str(HR_weed_list_Tas)
-HR_weed_list_Tas <- HR_weed_list_Tas%>%  dplyr::select(Sample:Wireweed)
-str(HR_weed_list_Tas)
-## Add ID to dataset so each row has a unique ID
-HR_weed_list_Tas <- HR_weed_list_Tas %>% 
-  mutate(ID = row_number()) %>% 
-  mutate(ID_Jaxs = paste0(ID,"_Tas"))
-
-HR_weed_list_Tas <- HR_weed_list_Tas %>% select(-ID)
-HR_weed_list_Tas <- HR_weed_list_Tas %>% select(ID_Jaxs, everything())
-
-
-
-HR_weed_list_Tas <- HR_weed_list_Tas %>%  rename(AEZ = `GRDC AEZ`)
-
-HR_weed_list_Tas_long <- pivot_longer(HR_weed_list_Tas,
-                                      cols = c(`3 corner Jack`:`Wireweed`),
-                                      names_to = "weed",
-                                      values_to="weed_class"
-)
-
-
-str(HR_weed_list_Tas_long)
-
-
-HR_weed_list_long <- rbind(HR_weed_list_NSW_long, HR_weed_list_Tas_long)
-rm(HR_weed_list_NSW, HR_weed_list_Tas, HR_weed_list_NSW_long,HR_weed_list_Tas_long,  )
-
-unique(HR_weed_list_long$weed_class)
+unique(all_states_with_data_long$weed_class)
 
 ## recode weed class with an number
-HR_weed_list_long <-HR_weed_list_long %>% 
+all_states_with_data_long <-all_states_with_data_long %>% 
   mutate(
     weed_class_code = case_when(
       weed_class =="VL" ~ "1",
@@ -204,39 +222,61 @@ HR_weed_list_long <-HR_weed_list_long %>%
 
 
 
-#### drop AEZ that we wont use ###
-unique(HR_weed_list_long$AEZ)
+#### keep the AEZ that we will use ###
+unique(all_states_with_data_long$AEZ)
 
-HR_weed_list_long <- HR_weed_list_long %>% filter(  AEZ ==  "NSW NW Qld SW" | 
-                                                    AEZ ==  "NSW NE Qld SE" |
-                                                    AEZ ==  "NSW Vic Slopes"|
-                                                    AEZ ==  "Vic High Rainfall"|
-                                                    AEZ ==  "NSW Central"|
-                                                    AEZ ==  "Tas Grain"
-                                                      )
+all_states_with_data_long <-
+  all_states_with_data_long %>% filter(
+      AEZ ==  "NSW NE / Qld SE" |
+      AEZ ==  "NSW NW / Qld SW" |
+      AEZ ==  "NSW Central" |
+      AEZ ==  "Qld Central" |
+      AEZ ==  "NSW NEW / Qld SE" | #this looks like a typo
+      AEZ ==  "NSW Vic Slopes" |
+      AEZ ==  "WA Northern" |
+      AEZ ==  "WA Central" |
+      AEZ ==  "WA Eastern" |
+      AEZ ==  "WA Sandplain"
+  )
+
+### Fix up typo 
+all_states_with_data_long <-
+  all_states_with_data_long %>% mutate(AEZ= case_when(
+    AEZ == "NSW NEW / Qld SE" ~"NSW NE / Qld SE",
+    TRUE ~AEZ)
+  ) 
 
 
-## remove all the rows with missing weeds
-HR_weed_list_long_remove_na <- HR_weed_list_long %>% filter(!is.na(weed_class))
-#rm(HR_weed_list_long, HR_weed_list)
+
+
 ################################################################################
 ### Recode crop into groups and drop hort crops
 
-unique(HR_weed_list_long_remove_na$Crop)
-HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>% 
+unique(all_states_with_data_long$Crop)
+ 
+
+
+all_states_with_data_long <- all_states_with_data_long %>% 
   mutate(crop_grouping = case_when(
-    Crop == "Wheat" |
-      Crop == "US Wheat"|
-      Crop == "Barley"|
-      Crop == "US Barley"|
-      Crop == "oats"|
-      Crop == "Oats"|
-      Crop == "Triticale" ~ "Cereals",
+      Crop == "Wheat" |
+      Crop == "US Wheat" |
+      Crop == "Barley" |
+      Crop == "US Barley" |
+      Crop == "oats" |
+      Crop == "Oats" |
+      Crop == "Triticale" |
+      Crop == "Wheat" |
+      Crop == "wheat" |
+      Crop == "Barley" |
+      Crop == "barley" |
+      Crop == "oat" |
+      Crop == "Oats" |
+      Crop == "wheat /barley" |
+      Crop == "Triticale"
+        ~ "Cereals",
       
     
       Crop == "Canola" |
-      
-     
       Crop == "Chick Peas" |
       Crop == "Chickpea" |
       Crop == "Chick peas" |
@@ -252,9 +292,24 @@ HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>%
       Crop == "Lupins_Albus" |
       Crop == "Lupins_narrow" |
       Crop == "Lupins/ wheat" |
-      Crop == "Freezer Peas" | 
-      Crop == "Linseed" | 
-      Crop == "Lupins/ wheat" ~ "Broadleaf",
+      Crop == "Freezer Peas" |
+      Crop == "Linseed" |
+      Crop == "Lupins/ wheat" |
+      Crop == "Canola" |
+      Crop == "canola"  |
+      Crop == "Chickpea" |
+      Crop == "Chick Peas" |
+      Crop == "chickpea" |
+      Crop == "Faba Beans" |
+      Crop == "faba bean"  |
+      Crop == "field pea" |
+      Crop == "Cow Peas"  |
+      Crop == "Broad Beans" |
+      Crop == "Lupins"  |
+      Crop == "lupin" |
+      Crop == "wheat or lupin"  |
+      Crop ==  "Vetch"      
+      ~ "Broadleaf",
     
     
       Crop == "Pasture" | 
@@ -262,69 +317,44 @@ HR_weed_list_long_remove_na <- HR_weed_list_long_remove_na %>%
       Crop == "Annual Pasture" |
       Crop == "Perennial pasture" |
       Crop == "Lucerne" |
-      Crop == "Perennial Pasture" ~ "Pasture",  
+      Crop == "Perennial Pasture" |
+      Crop =="Annual Pasture"    |
+      Crop =="Annual pasture"     |             
+      Crop =="Perennial pasture"|
+      Crop =="Perennial Pasture" 
+      ~ "Pasture",  
     
       Crop == "Fallow"  ~ "Fallow", 
+      
+      Crop == "Sorghum" ~   "Sorghum"  ,        
+      
+      Crop == "Safflower"|
+      Crop == "Maize" ~ "non_cereal_cotton_crop",
+        
     TRUE                      ~ "other"
   ))
 
 
 
-HR_weed_list_long <- HR_weed_list_long %>% 
-  mutate(crop_grouping = case_when(
-    Crop == "Wheat" |
-      Crop == "US Wheat"|
-      Crop == "Barley"|
-      Crop == "US Barley"|
-      Crop == "oats"|
-      Crop == "Oats"|
-      Crop == "Triticale" ~ "Cereals",
-    
-      Crop == "Canola" |
-      Crop == "Chick Peas" |
-      Crop == "Chickpea" |
-      Crop == "Chick peas" |
-      Crop == "Faba beans" |
-      Crop == "Field peas" |
-      Crop == "Broad beans" |
-      Crop == "Albus Lupins" |
-      Crop == "Albus lupins" |
-      Crop == "Peas" |
-      Crop == "Lupins" |
-      Crop == "Lentils" |
-      Crop == "Lupins _narrow" |
-      Crop == "Lupins_Albus" |
-      Crop == "Lupins_narrow" |
-      Crop == "Lupins/ wheat" |
-      Crop == "Freezer Peas" | 
-      Crop == "Linseed" | 
-      Crop == "Lupins/ wheat" ~ "Broadleaf",
-    
-    
-    Crop == "Pasture" | 
-      Crop == "Annual pasture" | 
-      Crop == "Annual Pasture" |
-      Crop == "Perennial pasture" |
-      Crop == "Lucerne" |
-      Crop == "Perennial Pasture" ~ "Pasture",  
-    
-    Crop == "Fallow"  ~ "Fallow", 
-    TRUE                      ~ "other"
-  ))
 
 
 
-## need to check that some of these crops are coded correctly
-##Triticale, Freezer Peas, Linseed, Lucerne, Oaten Hay
-## what about grouping pasture with fallow is this ok?
+## need to check that some of these crops are coded correctly #NOTE WE HAVE HEAPS OF MISSING DATA ENTRIES FOR CROPS 
 
-unique(HR_weed_list_long_remove_na$crop_grouping)
-check_what_coded_other<- HR_weed_list_long_remove_na %>% filter(crop_grouping == "other")
-check_what_coded_Broadleaf<- HR_weed_list_long_remove_na %>% filter(crop_grouping == "Broadleaf")
+
+unique(all_states_with_data_long$crop_grouping)
+check_what_coded_other<- all_states_with_data_long %>% filter(crop_grouping == "other")
+check_what_coded_Broadleaf<- all_states_with_data_long %>% filter(crop_grouping == "Broadleaf")
 
 rm(check_what_coded_other, check_what_coded_Broadleaf)
 
 ################################################################################
+
+## remove all the rows with missing weeds
+all_states_with_data_long_remove_na <- all_states_with_data_long %>% filter(!is.na(weed_class))
+
+
+
 ### make a list of weeds per zone and crop
 str(HR_weed_list_long_remove_na)
 
