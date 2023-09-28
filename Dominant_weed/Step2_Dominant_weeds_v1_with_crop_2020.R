@@ -12,8 +12,8 @@ library(DT)
 ###    Bring in the data ########
 ################################################################################
 
-all_states_with_data_long <- read.csv(file =  "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/2020_data/all_states_with_data_long_step1.csv")
-
+#all_states_with_data_long <- read.csv(file =  "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/2020_data/all_states_with_data_long_step1.csv")
+all_states_with_data_long <- read.csv(file ="C:/Users/ouz001/working_from_home_post_Sep2022/weed_round2_offline/all_states_with_data_long_step1.csv")
 #####################################################################################
 
 ## remove all the rows with missing weeds

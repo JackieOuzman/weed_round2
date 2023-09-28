@@ -128,8 +128,8 @@ all_states <- rbind(
   HR_weed_list_2020_SA,
   HR_weed_list_2020_TAs,
   HR_weed_list_2020_Vic,
-  HR_weed_list_2020_WA,
-  HR_weed_list_2020_S_NSW
+  HR_weed_list_2020_WA
+
 )
 
 #remove the empty clms (the ones I think are empty - with numbers)
@@ -349,7 +349,8 @@ check_what_coded_Broadleaf<- all_states_with_data_long %>% filter(crop_grouping 
 rm(check_what_coded_other, check_what_coded_Broadleaf)
 
 ################################################################################
-"W:\Economic impact of weeds round 2\HR\Jackie_working\Weed_list\2020_data"
+
 
 write.csv(all_states_with_data_long, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/2020_data/all_states_with_data_long_step1.csv")
+write.csv(all_states_with_data_long, "C:/Users/ouz001/working_from_home_post_Sep2022/weed_round2_offline/all_states_with_data_long_step1.csv")
 
