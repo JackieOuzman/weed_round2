@@ -384,3 +384,6 @@ rm(check_what_coded_other, check_what_coded_Broadleaf)
 write.csv(all_states_with_data_long, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/2020_data/all_states_with_data_long_step1.csv")
 write.csv(all_states_with_data_long, "C:/Users/ouz001/working_from_home_post_Sep2022/weed_round2_offline/all_states_with_data_long_step1.csv")
 
+
+
+unique(all_states_with_data_long$weed)
