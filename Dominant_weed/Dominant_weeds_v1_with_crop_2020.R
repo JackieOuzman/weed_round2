@@ -84,6 +84,7 @@ list9<- as.data.frame(colnames(HR_weed_list_2020_WA))%>% rename("list" = "colnam
 
 list_clms <- rbind(list1, list2, list3, list4, list5, list6, list7, list8, list9)
 list_clms <- list_clms %>%  distinct()
+#list_clms <- toupper(list_clms)
 
 rm(list1, list2, list3, list4, list5, list6, list7, list8, list9)
 print(list_clms)
@@ -149,6 +150,8 @@ all_states <- all_states %>%
 colnames(all_states)
 
 
+
+
 #################################################################################
 # I have one large df with all the states.
 ## next problem is that some states have no data or no crop class - these need to be filtered out until the database is updated.
@@ -204,6 +207,33 @@ all_states_with_data_long <- pivot_longer(all_states_with_data,
 
 
 str(all_states_with_data_long)
+################################################################################
+### some of the weed species names need ficing up.
+all_states_with_data_long$weed <- toupper(all_states_with_data_long$weed)
+
+all_states_with_data_long <- all_states_with_data_long %>% arrange(weed)
+
+
+
+all_states_with_data_long <- all_states_with_data_long %>% mutate(
+  weed = case_when(
+    weed == "BIND WEED" ~ "BINDWEED",
+    weed == "BLACKBERRY NIGHT SHADE" |
+    weed == "NIGHTSHADE SPP"  ~ "BLACKBERRY NIGHTSHADE",
+    weed == "BRASSICA SPECIES"  ~ "BRASSICA",
+    weed == "MEXICAN POPPIES"  ~ "MEXICAN POPPY",
+    weed == "SHEPHERD'S PURSE CAPSELLA BURSA-PASTORIS"  ~ "SHEPHERDS PURSE",
+    weed == "WO"  ~ "WILD OATS",
+    weed == "WIRE WEED"  ~ "WIREWEED",
+    TRUE ~weed
+  )
+)
+
+
+
+
+
+
 
 unique(all_states_with_data_long$weed_class)
 
