@@ -30,7 +30,7 @@ HR_weed_list_2020_Qld <-
     "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
     sheet = "Qld"
   ) %>% mutate(tab = "Qld") %>%
-  filter(!is.na(Sample))
+  filter(!is.na(Waypoint))
 HR_weed_list_2020_SA <-
   read_excel(
     "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
@@ -43,18 +43,18 @@ HR_weed_list_2020_TAs <-
     sheet = "Tas"
   ) %>% mutate(tab = "Tas") %>%
   filter(!is.na(Sample))
-HR_weed_list_2020_Vic <-
-  read_excel(
-    "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
-    sheet = "Vic"
-  ) %>% mutate(tab = "Vic") %>%
-  filter(!is.na(Sample))
+# HR_weed_list_2020_Vic <-
+#   read_excel(
+#     "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
+#     sheet = "Vic"
+#   ) %>% mutate(tab = "Vic") %>%
+#   filter(!is.na(Sample))
 HR_weed_list_2020_WA <-
   read_excel(
     "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
     sheet = "WA"
   ) %>% mutate(tab = "WA") %>%
-  filter(!is.na(Sample))
+  filter(!is.na(Waypoint))
 HR_weed_list_2020_N_NSW_Summer <-
   read_excel(
     "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
@@ -66,8 +66,11 @@ HR_weed_list_2020_Qld_Summer <-
     "W:/Economic impact of weeds round 2/HR/raw_data/Weed species data 2020 survey.xlsx",
     sheet = "Qld Summer"
   ) %>% mutate(tab = "Qld_Summer") %>%
-  filter(!is.na(Sample))
+  filter(!is.na(Waypoint))
 
+HR_weed_list_2020_Qld_Summer<- HR_weed_list_2020_Qld_Summer %>% rename(Sample = Waypoint)
+HR_weed_list_2020_WA<- HR_weed_list_2020_WA %>% rename(Sample = Waypoint)
+HR_weed_list_2020_Qld<- HR_weed_list_2020_Qld %>% rename(Sample = Waypoint)
 
 ###################################################################################################################
 ### List of all the weeds .
@@ -79,14 +82,16 @@ list4<- as.data.frame(colnames(HR_weed_list_2020_Qld_Summer))%>% rename("list" =
 list5<- as.data.frame(colnames(HR_weed_list_2020_S_NSW))%>% rename("list" = "colnames(HR_weed_list_2020_S_NSW)")
 list6<- as.data.frame(colnames(HR_weed_list_2020_SA))%>% rename("list" = "colnames(HR_weed_list_2020_SA)")
 list7<- as.data.frame(colnames(HR_weed_list_2020_TAs))%>% rename("list" = "colnames(HR_weed_list_2020_TAs)")
-list8<- as.data.frame(colnames(HR_weed_list_2020_Vic))%>% rename("list" = "colnames(HR_weed_list_2020_Vic)")
+#list8<- as.data.frame(colnames(HR_weed_list_2020_Vic))%>% rename("list" = "colnames(HR_weed_list_2020_Vic)")
+#No data in VIC
+
 list9<- as.data.frame(colnames(HR_weed_list_2020_WA))%>% rename("list" = "colnames(HR_weed_list_2020_WA)")
 
-list_clms <- rbind(list1, list2, list3, list4, list5, list6, list7, list8, list9)
+list_clms <- rbind(list1, list2, list3, list4, list5, list6, list7, list9) #list8VIC has no data
 list_clms <- list_clms %>%  distinct()
 #list_clms <- toupper(list_clms)
 
-rm(list1, list2, list3, list4, list5, list6, list7, list8, list9)
+rm(list1, list2, list3, list4, list5, list6, list7,list9) # list8 VIC has no data
 print(list_clms)
 
 
@@ -114,7 +119,7 @@ HR_weed_list_2020_Qld <- add_missing_cols(HR_weed_list_2020_Qld,list_clms)
 HR_weed_list_2020_Qld_Summer <- add_missing_cols(HR_weed_list_2020_Qld_Summer,list_clms)
 HR_weed_list_2020_SA <- add_missing_cols(HR_weed_list_2020_SA,list_clms)
 HR_weed_list_2020_TAs <- add_missing_cols(HR_weed_list_2020_TAs,list_clms)
-HR_weed_list_2020_Vic <- add_missing_cols(HR_weed_list_2020_Vic,list_clms)
+#HR_weed_list_2020_Vic <- add_missing_cols(HR_weed_list_2020_Vic,list_clms)
 HR_weed_list_2020_WA <- add_missing_cols(HR_weed_list_2020_WA,list_clms)
 HR_weed_list_2020_S_NSW <- add_missing_cols(HR_weed_list_2020_S_NSW,list_clms)
 
@@ -128,7 +133,7 @@ all_states <- rbind(
   HR_weed_list_2020_S_NSW,
   HR_weed_list_2020_SA,
   HR_weed_list_2020_TAs,
-  HR_weed_list_2020_Vic,
+  #HR_weed_list_2020_Vic,
   HR_weed_list_2020_WA
 
 )
@@ -143,6 +148,16 @@ all_states <- all_states %>%
     -"...9",
     -"...12",
     -"...67",
+    
+    -"...13",  
+    -"...2",
+    -"...4",
+    -"...2",
+    -"...16",
+    -"...48",
+    -"...49",
+    -"...27",
+    
     -"Species present"#,
     #-"Waypoint" # I replaced this with Sample in the raw data
   )
@@ -163,8 +178,8 @@ all_states_with_data <- all_states %>% filter(tab == "N_NSW"|
                                                 tab =="Qld"|
                                                 tab =="Qld_Summer"|
                                                 tab == "S_NSW"|
-                                              #tab ==SA,
-                                              #tab ==Tas,
+                                                tab =="SA"|
+                                                tab =="Tas"|
                                               #tab ==Vic,
                                                 tab =="WA")
 
@@ -193,14 +208,14 @@ all_states_with_data <- all_states_with_data %>% select(ID_Jaxs, everything())
 colnames(all_states_with_data)
 
 
-all_states_with_data <- all_states_with_data%>%  dplyr::select(ID_Jaxs:"Ox  Tongue" )
+all_states_with_data <- all_states_with_data%>%  dplyr::select(ID_Jaxs:"Wild sage" ) # make sure this is the last weed on the list
 dim(all_states_with_data)
 all_states_with_data <- all_states_with_data %>%  rename(AEZ = `GRDC AEZ`)
-all_states_with_data[, 7:144] <- lapply(all_states_with_data[, 7:144], as.character) #Note that this step will need to be checked ie are all the weed togther and what clm they start and stop
+all_states_with_data[, 7:157] <- lapply(all_states_with_data[, 7:157], as.character) #Note that this step will need to be checked ie are all the weed togther and what clm they start and stop
 
 
 all_states_with_data_long <- pivot_longer(all_states_with_data,
-                                  cols = c(`Annual ryegrass`:`Ox  Tongue`),
+                                  cols = c(`Annual ryegrass`:`Wild sage`), # makes sure this is the last weed on the list
                                   names_to = "weed",
                                   values_to="weed_class"
                                   )
@@ -208,10 +223,12 @@ all_states_with_data_long <- pivot_longer(all_states_with_data,
 
 str(all_states_with_data_long)
 ################################################################################
-### some of the weed species names need ficing up.
+### some of the weed species names need fixing up.
 all_states_with_data_long$weed <- toupper(all_states_with_data_long$weed)
 
 all_states_with_data_long <- all_states_with_data_long %>% arrange(weed)
+
+unique(all_states_with_data_long$weed)
 
 
 
@@ -221,10 +238,17 @@ all_states_with_data_long <- all_states_with_data_long %>% mutate(
     weed == "BLACKBERRY NIGHT SHADE" |
     weed == "NIGHTSHADE SPP"  ~ "BLACKBERRY NIGHTSHADE",
     weed == "BRASSICA SPECIES"  ~ "BRASSICA",
+   # weed == "BRACHIARIA SPP."  ~ "BRASSICA", ? is this a typo?
+    
     weed == "MEXICAN POPPIES"  ~ "MEXICAN POPPY",
     weed == "SHEPHERD'S PURSE CAPSELLA BURSA-PASTORIS"  ~ "SHEPHERDS PURSE",
     weed == "WO"  ~ "WILD OATS",
     weed == "WIRE WEED"  ~ "WIREWEED",
+    
+    weed == "BLUE HELIOTOPE...86"  ~ "BLUE HELIOTOPE",
+    weed == "BLUE HELIOTOPE...87"  ~ "BLUE HELIOTOPE",
+    
+    
     TRUE ~weed
   )
 )
@@ -246,11 +270,14 @@ all_states_with_data_long <-all_states_with_data_long %>%
       weed_class =="M" ~ "3",
       weed_class =="H" ~ "4",
       weed_class =="VH" ~ "5",
+      
+      weed_class =="pasturH" ~ NA,
+      weed_class =="I see no Tasmanian data either" ~ NA,
       TRUE ~ weed_class
     )
   )
 
-
+unique(all_states_with_data_long$weed_class_code)
 
 #### keep the AEZ that we will use ###
 unique(all_states_with_data_long$AEZ)
@@ -258,10 +285,15 @@ unique(all_states_with_data_long$AEZ)
 all_states_with_data_long <-
   all_states_with_data_long %>% filter(
       AEZ ==  "NSW NE / Qld SE" |
-      AEZ ==  "NSW NW / Qld SW" |
-      AEZ ==  "NSW Central" |
-      AEZ ==  "Qld Central" |
       AEZ ==  "NSW NEW / Qld SE" | #this looks like a typo
+      AEZ ==  "NSW NW / Qld SW" |
+      
+      AEZ ==  "Qld Central" |
+      AEZ ==  "SA Mid N Lower YP EP" |
+      AEZ ==  "SA Vic Mallee"  |
+      AEZ ==  "SA Vic Bordertown Wimmera" |                   
+        
+      AEZ ==  "NSW Central" |
       AEZ ==  "NSW Vic Slopes" |
       AEZ ==  "WA Northern" |
       AEZ ==  "WA Central" |
