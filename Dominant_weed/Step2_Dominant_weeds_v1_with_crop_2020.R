@@ -52,8 +52,14 @@ paddock_per_AEZ_summary
 
 
 ################################################################################
-#count the number of weed occurrence per AEZ, weed and year  
-AEZ_weeds_count <- all_states_with_data_long_remove_no_data %>% count(AEZ, weed, sort = TRUE)    
+#count the number of weed occurrence per AEZ, weed 
+str(all_states_with_data_long_remove_no_data)
+
+all_states_with_data_long_remove_no_weeds <- all_states_with_data_long_remove_no_data %>% 
+  filter(!is.na(weed_class)) 
+
+AEZ_weeds_count <- all_states_with_data_long_remove_no_weeds %>% 
+  count(AEZ, weed, sort = TRUE)    
 AEZ_weeds_count <- AEZ_weeds_count %>%  arrange(AEZ, weed)
 str(AEZ_weeds_count) 
 AEZ_weeds_count <- AEZ_weeds_count %>%  rename(count = n)
@@ -110,7 +116,10 @@ write.csv(top4weeds,
 #Addd ranking to the long list of weeds
 
 rank1_2 <- top4weeds %>% filter(rank == 1 | rank==2) 
-rank <- left_join(all_states_with_data_long_remove_na, rank1_2)
+
+#rank <- left_join(all_states_with_data_long_remove_na, rank1_2) old code
+rank <- left_join(all_states_with_data_long_remove_no_weeds, rank1_2)
+
 ## remove all the rows with missing weeds
 rank <- rank %>% filter(!is.na(rank))
 str(rank)
