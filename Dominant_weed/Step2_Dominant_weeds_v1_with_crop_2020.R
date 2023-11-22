@@ -53,7 +53,7 @@ paddock_per_AEZ_summary
 
 ################################################################################
 #count the number of weed occurrence per AEZ, weed and year  
-AEZ_weeds_count <- all_states_with_data_long_remove_na %>% count(AEZ, weed, sort = TRUE)    
+AEZ_weeds_count <- all_states_with_data_long_remove_no_data %>% count(AEZ, weed, sort = TRUE)    
 AEZ_weeds_count <- AEZ_weeds_count %>%  arrange(AEZ, weed)
 str(AEZ_weeds_count) 
 AEZ_weeds_count <- AEZ_weeds_count %>%  rename(count = n)
