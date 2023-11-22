@@ -16,16 +16,28 @@ all_states_with_data_long <- read.csv(file =  "W:/Economic impact of weeds round
 #all_states_with_data_long <- read.csv(file ="C:/Users/ouz001/working_from_home_post_Sep2022/weed_round2_offline/all_states_with_data_long_step1.csv")
 #####################################################################################
 
-## remove all the rows with missing weeds
-all_states_with_data_long_remove_na <- all_states_with_data_long %>% filter(!is.na(weed_class))
+### the data has been updated it now contains no data when the paddock was not sampled
 
+str(all_states_with_data_long)
+unique(all_states_with_data_long$crop_grouping)
+unique(all_states_with_data_long$Crop) # "No data"  
+
+## remove all the rows that the paddocks were not sampled coded by JB as No data
+all_states_with_data_long_remove_no_data <- all_states_with_data_long %>% filter(Crop != "No data") %>% 
+  filter(Crop != "0")
+unique(all_states_with_data_long_remove_no_data$Crop)
 
 
 ################################################################################
 ## how many paddocks per zone
 
-colnames(all_states_with_data_long_remove_na)
-paddock_per_AEZ <- all_states_with_data_long %>%  count(Sample, AEZ) #
+colnames(all_states_with_data_long_remove_no_data)
+Unique_paddock_ID <- all_states_with_data_long_remove_no_data %>% 
+  mutate(sample_AEz =   paste0(Sample,"_", AEZ))
+
+Unique_paddock_ID <- Unique_paddock_ID %>% distinct(sample_AEz, .keep_all = TRUE)
+
+paddock_per_AEZ <- Unique_paddock_ID %>%  count(Sample, AEZ) #
 paddock_per_AEZ
 
 paddock_per_AEZ_summary <- paddock_per_AEZ %>% 

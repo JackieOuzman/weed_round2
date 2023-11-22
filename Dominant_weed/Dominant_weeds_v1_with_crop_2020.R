@@ -334,7 +334,10 @@ all_states_with_data_long <- all_states_with_data_long %>%
       Crop == "oat" |
       Crop == "Oats" |
       Crop == "wheat /barley" |
-      Crop == "Triticale"
+      Crop == "Triticale" |
+      Crop == "Corn"|
+      Crop == "Cereal rye"|
+      Crop == "Oaten hay"
         ~ "Cereals",
       
     
@@ -348,8 +351,10 @@ all_states_with_data_long <- all_states_with_data_long %>%
       Crop == "Albus Lupins" |
       Crop == "Albus lupins" |
       Crop == "Peas" |
+      Crop == "peas" |
       Crop == "Lupins" |
       Crop == "Lentils" |
+      Crop == "lentils" |
       Crop == "Lupins _narrow" |
       Crop == "Lupins_Albus" |
       Crop == "Lupins_narrow" |
@@ -368,9 +373,14 @@ all_states_with_data_long <- all_states_with_data_long %>%
       Crop == "Cow Peas"  |
       Crop == "Broad Beans" |
       Crop == "Lupins"  |
+      Crop == "Lupin"  |
       Crop == "lupin" |
       Crop == "wheat or lupin"  |
-      Crop ==  "Vetch"      
+      Crop ==  "Vetch" |
+      Crop == "Mungbeans"|
+      Crop == "Mungbean"|
+      Crop == "Field Peas"|
+      Crop == "Chickpea (edge)"
       ~ "Broadleaf",
     
     
@@ -383,22 +393,29 @@ all_states_with_data_long <- all_states_with_data_long %>%
       Crop =="Annual Pasture"    |
       Crop =="Annual pasture"     |             
       Crop =="Perennial pasture"|
-      Crop =="Perennial Pasture" 
-      ~ "Pasture",  
-    
+      Crop =="Perennial Pasture" |
+      Crop =="Pasture"~ "Pasture",  
+      Crop =="pasture"~ "Pasture",  
+      
       Crop == "Fallow"  ~ "Fallow", 
+      Crop == "Sorghum" ~   "Sorghum", 
+      Crop == "Fallow/ Sorghum" ~   "Sorghum", 
+      Crop == "Sorghum/Fallow" ~   "Sorghum", 
       
-      Crop == "Sorghum" ~   "Sorghum"  ,        
-      
+      Crop == "D/L Cotton" ~   "Cotton",
       Crop == "Safflower"|
       Crop == "Maize" ~ "non_cereal_cotton_crop",
-        
-    TRUE                      ~ "other"
+      Crop == "Roadside" ~ "non_cereal_cotton_crop",
+      Crop == "Railway" ~ "non_cereal_cotton_crop",
+      
+      Crop == "No data" ~ "No data",
+      Crop == "0" ~ "No data",
+    TRUE                      ~ Crop
   ))
 
 
 
-
+unique(all_states_with_data_long$crop_grouping)
 
 
 ## need to check that some of these crops are coded correctly #NOTE WE HAVE HEAPS OF MISSING DATA ENTRIES FOR CROPS 
