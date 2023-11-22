@@ -115,10 +115,10 @@ write.csv(top4weeds,
 ################################################################################
 #Addd ranking to the long list of weeds
 
-rank1_2 <- top4weeds %>% filter(rank == 1 | rank==2) 
+rank1_2_3_4 <- top4weeds %>% filter(rank == 1 | rank==2 | rank==3 | rank==4) 
 
-#rank <- left_join(all_states_with_data_long_remove_na, rank1_2) old code
-rank <- left_join(all_states_with_data_long_remove_no_weeds, rank1_2)
+#rank <- left_join(all_states_with_data_long_remove_na, rank1_2_3_4) old code
+rank <- left_join(all_states_with_data_long_remove_no_weeds, rank1_2_3_4)
 
 ## remove all the rows with missing weeds
 rank <- rank %>% filter(!is.na(rank))
@@ -162,11 +162,24 @@ rank_AEZ_weed_densities <- ungroup(rank_AEZ_weed_densities)
 ### add the mode and median back into the rank data 
 rank_density_mode <- left_join(rank, rank_AEZ_weed_densities)
 
+rank_density_mode$rank <- as.double(rank_density_mode$rank)
+
+rank_density_mode %>% distinct(AEZ, rank) %>% arrange(AEZ, rank)
+
+
 rank_density_mode_display_weed1 <- rank_density_mode %>% 
   filter(rank == 1) %>% 
   distinct(AEZ,  .keep_all = TRUE) %>% select(AEZ, mode)
 rank_density_mode_display_weed2 <- rank_density_mode %>% 
   filter(rank == 2) %>% 
+  distinct(AEZ,.keep_all = TRUE) %>% select(AEZ, mode)
+
+rank_density_mode_display_weed3 <- rank_density_mode %>% 
+  filter(rank == 3) %>% 
+  distinct(AEZ,.keep_all = TRUE) %>% select(AEZ, mode)
+
+rank_density_mode_display_weed4 <- rank_density_mode %>% 
+  filter(rank == 4) %>% 
   distinct(AEZ,.keep_all = TRUE) %>% select(AEZ, mode)
 
 ### recode mode.
@@ -196,9 +209,28 @@ rank_density_mode_display_weed2 <-rank_density_mode_display_weed2 %>%
     )
   )
 
-
-
-
+rank_density_mode_display_weed3 <-rank_density_mode_display_weed3 %>% 
+  mutate(
+    weed_class_Mode = case_when(
+      mode ==1 ~ "VL",
+      mode ==2 ~ "L",
+      mode ==3 ~ "M",
+      mode ==4~ "H",
+      mode ==5 ~ "VH",
+      TRUE ~ "check"
+    ))
+    
+rank_density_mode_display_weed4 <-rank_density_mode_display_weed4 %>% 
+      mutate(
+        weed_class_Mode = case_when(
+          mode ==1 ~ "VL",
+          mode ==2 ~ "L",
+          mode ==3 ~ "M",
+          mode ==4~ "H",
+          mode ==5 ~ "VH",
+          TRUE ~ "check"
+        ))
+  
 
 
 
@@ -229,9 +261,9 @@ Final_list_AEZ <-Final_list_AEZ %>%
   )
 
 
-write.csv(Final_list_AEZ, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/2020_data/Final_Rank1_2_weed_AEZ_2020.csv")
+write.csv(Final_list_AEZ, "W:/Economic impact of weeds round 2/HR/Jackie_working/Weed_list/2020_data/Final_rank1_2_3_4_weed_AEZ_2020.csv")
 
-rm(rank_density_mode, rank1_2)
+rm(rank_density_mode, rank1_2_3_4)
 
 
 
