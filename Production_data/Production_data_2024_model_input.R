@@ -21,6 +21,7 @@ yld_2024_AEZ_long <- yld_2024_AEZ %>%
   pivot_longer(cols = "Barley":"Cotton",
                names_to = "Crop",
                values_to = "Value")
+
 yld_2024_AEZ_long <- yld_2024_AEZ_long %>% mutate(Unit = "yield")
 rm(yld_2024_AEZ)
 
@@ -29,7 +30,7 @@ rm(yld_2024_AEZ)
 unique(yld_2024_AEZ_long$`AgroEcological Zone`)
 
 yld_2024_AEZ_long_sand_plain_mallee <- yld_2024_AEZ_long %>% filter(`AgroEcological Zone` == "WA Sandplain" |
-                                                                    `AgroEcological Zone` == "WA Sandplain"  ) %>% 
+                                                                    `AgroEcological Zone` == "WA Mallee"  ) %>% 
   group_by(Year, Crop) %>% 
   summarise(mean = mean(Value, na.rm=TRUE)) 
 
@@ -67,6 +68,17 @@ yld_2024_AEZ_long <- yld_2024_AEZ_long %>%
 
 yld_2024_AEZ_long <- yld_2024_AEZ_long %>% filter(!is.na(AEZ_code))
 rm(yld_2024_AEZ_long_sand_plain_mallee)
+#### remove Sorghum and Cotton for AEZ above 5
+
+unique(yld_2024_AEZ_long$Crop)
+
+yld_2024_AEZ_long <- yld_2024_AEZ_long %>%
+  filter(AEZ_code %in% c(1,2,3,4,5) | 
+           AEZ_code %in% c(6,7,8,9,10,11,12,13,14) & !Crop %in% c("Grain Sorghum", "Cotton"))
+  
+
+
+
 ################################################################################
 H_2024_AEZ <-  read_excel(path =
                               "W:/Economic impact of weeds round 2/production_data/1.Input_data_2024_model/23.09.0014 GRDC AEZ Data with Legumes_jax.xlsx",
@@ -79,15 +91,16 @@ str(H_2024_AEZ)
 unique(H_2024_AEZ$`AgroEcological Zone`)
 
 H_2024_AEZ_mallee_sand <- H_2024_AEZ %>% filter(`AgroEcological Zone` == "WA Sandplain" |
-                                                                      `AgroEcological Zone` == "WA Sandplain"  ) %>% 
-  group_by(Year, Crop) %>% 
+                                                                      `AgroEcological Zone` == "WA Mallee"  ) %>% 
+  group_by(Year, Crop, Unit) %>% 
   summarise(mean = mean(Value, na.rm=TRUE)) 
 
 H_2024_AEZ_mallee_sand<- ungroup(H_2024_AEZ_mallee_sand)
 
+str(H_2024_AEZ_mallee_sand)
+
 H_2024_AEZ_mallee_sand <- H_2024_AEZ_mallee_sand %>% 
-  mutate(`AgroEcological Zone` =  "WA Sandplain/ Mallee",
-         Unit = "yield") %>% 
+  mutate(`AgroEcological Zone` =  "WA Sandplain/ Mallee") %>% 
   rename(Value = mean)
 
 str(H_2024_AEZ_mallee_sand)
@@ -117,6 +130,11 @@ H_2024_AEZ <- H_2024_AEZ %>%
 
 H_2024_AEZ <- H_2024_AEZ %>% filter(!is.na(AEZ_code))
 rm(H_2024_AEZ_mallee_sand)
+
+H_2024_AEZ <- H_2024_AEZ %>%
+  filter(AEZ_code %in% c(1,2,3,4,5) | 
+           AEZ_code %in% c(6,7,8,9,10,11,12,13,14) & !Crop %in% c("Grain Sorghum", "Cotton"))
+
 ################################################################################
 
 
@@ -189,7 +207,7 @@ Price_2024_AEZ_long <- Price_2024_AEZ_long %>%
 unique(Price_2024_AEZ_long$`AgroEcological Zone`)
 
 Price_2024_AEZ_long_mallee_sand <- Price_2024_AEZ_long %>% filter(`AgroEcological Zone` == "WA Sandplain" |
-                                                  `AgroEcological Zone` == "WA Sandplain"  ) %>% 
+                                                  `AgroEcological Zone` == "WA Mallee"  ) %>% 
   group_by(Year, Crop) %>% 
   summarise(mean = mean(Value, na.rm=TRUE)) 
 
@@ -197,7 +215,7 @@ Price_2024_AEZ_long_mallee_sand<- ungroup(Price_2024_AEZ_long_mallee_sand)
 
 Price_2024_AEZ_long_mallee_sand <- Price_2024_AEZ_long_mallee_sand %>% 
   mutate(`AgroEcological Zone` =  "WA Sandplain/ Mallee",
-         Unit = "yield") %>% 
+         Unit = "Dollars") %>% 
   rename(Value = mean)
 
 Price_2024_AEZ_long <- rbind(Price_2024_AEZ_long, Price_2024_AEZ_long_mallee_sand)
@@ -226,6 +244,12 @@ Price_2024_AEZ_long <- Price_2024_AEZ_long %>%
 
 Price_2024_AEZ_long <- Price_2024_AEZ_long %>% filter(!is.na(AEZ_code))
 rm(Price_2024_AEZ_long_mallee_sand)
+
+Price_2024_AEZ_long <- Price_2024_AEZ_long %>%
+  filter(AEZ_code %in% c(1,2,3,4,5) | 
+           AEZ_code %in% c(6,7,8,9,10,11,12,13,14) & !Crop %in% c("Grain Sorghum", "Cotton"))
+
+
 ################################################################################
 
 ##################################################################################
@@ -277,7 +301,7 @@ Price_Pusles_2024_AEZ_long <- Price_Pusles_2024_AEZ_long %>%
 unique(Price_Pusles_2024_AEZ_long$`AgroEcological Zone`)
 
 Price_Pusles_2024_AEZ_long_mallee_sand <- Price_Pusles_2024_AEZ_long %>% filter(`AgroEcological Zone` == "WA Sandplain" |
-                                                  `AgroEcological Zone` == "WA Sandplain"  ) %>% 
+                                                  `AgroEcological Zone` == "WA Mallee"  ) %>% 
   group_by(Year, Crop) %>% 
   summarise(mean = mean(Value, na.rm=TRUE)) 
 
@@ -285,7 +309,7 @@ Price_Pusles_2024_AEZ_long_mallee_sand<- ungroup(Price_Pusles_2024_AEZ_long_mall
 
 Price_Pusles_2024_AEZ_long_mallee_sand <- Price_Pusles_2024_AEZ_long_mallee_sand %>% 
   mutate(`AgroEcological Zone` =  "WA Sandplain/ Mallee",
-         Unit = "yield") %>% 
+         Unit = "Dollars") %>% 
   rename(Value = mean)
 
 str(Price_Pusles_2024_AEZ_long)
@@ -316,6 +340,12 @@ Price_Pusles_2024_AEZ_long <- Price_Pusles_2024_AEZ_long %>%
 
 Price_Pusles_2024_AEZ_long <- Price_Pusles_2024_AEZ_long %>% filter(!is.na(AEZ_code))
 rm(Price_Pusles_2024_AEZ_long_mallee_sand)
+
+Price_Pusles_2024_AEZ_long <- Price_Pusles_2024_AEZ_long %>%
+  filter(AEZ_code %in% c(1,2,3,4,5) | 
+           AEZ_code %in% c(6,7,8,9,10,11,12,13,14) & !Crop %in% c("Grain Sorghum", "Cotton"))
+
+
 ################################################################################
 
 
@@ -406,10 +436,12 @@ Summary_Kyntec_Prooduction <- Kyntec_Prooduction %>%
 Summary_Kyntec_Prooduction <- Summary_Kyntec_Prooduction %>% 
   mutate(for_join = paste0(AEZ_code, Crop, Unit))
 ################################################################################
-## not working yet!!
+
 
 
 
 use_this <- full_join(Summary_Kyntec_Prooduction, Summary_Kyntec_Prooduction_2019_2020_2021)
+
+
 write.csv(use_this,
           "W:/Economic impact of weeds round 2/production_data/1.Input_data_2024_model/production_data_AEZ.csv",)
