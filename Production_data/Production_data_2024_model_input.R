@@ -93,7 +93,7 @@ unique(H_2024_AEZ$`AgroEcological Zone`)
 H_2024_AEZ_mallee_sand <- H_2024_AEZ %>% filter(`AgroEcological Zone` == "WA Sandplain" |
                                                                       `AgroEcological Zone` == "WA Mallee"  ) %>% 
   group_by(Year, Crop, Unit) %>% 
-  summarise(mean = mean(Value, na.rm=TRUE)) 
+  summarise(sum = sum(Value, na.rm=TRUE)) 
 
 H_2024_AEZ_mallee_sand<- ungroup(H_2024_AEZ_mallee_sand)
 
@@ -101,7 +101,7 @@ str(H_2024_AEZ_mallee_sand)
 
 H_2024_AEZ_mallee_sand <- H_2024_AEZ_mallee_sand %>% 
   mutate(`AgroEcological Zone` =  "WA Sandplain/ Mallee") %>% 
-  rename(Value = mean)
+  rename(Value = sum)
 
 str(H_2024_AEZ_mallee_sand)
 str(H_2024_AEZ)
