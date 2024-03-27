@@ -5,10 +5,8 @@ date: "2024-03-27"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
-
+```{r setup with library, include=FALSE}
+knitr::opts_chunk$set(include = FALSE)
 library(tidyverse)
 library(readxl)
 library(dplyr)
@@ -21,22 +19,32 @@ library(lubridate)
 
 ```
 
-## R Markdown
+## Cost of weed project
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Yield loss module - residual weeds in crop
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+This document is for:
+1. checking the model outputs
+2. creating template for reporting with plots
 
-```{r cars}
-summary(cars)
+```{r import the model output data, message=FALSE, warning=FALSE, include=FALSE}
+
+data_source <- "W:/Economic impact of weeds round 2/model/"
+df <- read_excel(paste0(data_source, "yield loss AEZ.xlsx"), sheet = "model cals residual weeds")
+
+
 ```
 
-## Including Plots
+## For each AEZ and represenative farm (not using grossed up values)
 
-You can also embed plots, for example:
+1. for all the farms across all the AEZ how much yield is lost in tonnage
+2. what is this as a percentage of total yield 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r total yield loss all AEZ all crop rep farm not grossed up, echo=FALSE}
+
+
+
+
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
