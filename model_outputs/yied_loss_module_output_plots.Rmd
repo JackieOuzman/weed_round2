@@ -16,7 +16,8 @@ library(ggpubr)
 library(DT)
 
 library(lubridate)
-
+library(patchwork)
+#install.packages("patchwork")
 ```
 
 ## Cost of weed project
