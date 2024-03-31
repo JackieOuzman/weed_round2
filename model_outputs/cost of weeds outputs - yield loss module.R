@@ -114,9 +114,27 @@ unique(step1_Summary_weed1_2_yld_loss_GU$`AEZ for report`)
 
 ## 2024 results ----
 
+unique(step1_Summary_weed1_2_yld_loss_GU$Crop)
+str(step1_Summary_weed1_2_yld_loss_GU$Crop)
+
+
+
+step1_Summary_weed1_2_yld_loss_GU$Crop <- factor(step1_Summary_weed1_2_yld_loss_GU$Crop, 
+                                                 levels = c("Wheat", "Barley", "Oats", "Canola", "Pulse", "Sorghum",
+                                                            "Cotton" ))
+
+
 step1_Summary_weed1_2_yld_loss_GU %>% 
   ggplot(aes(x= `AEZ for report`, y = precenatge_yld_loss_tonnes_per_farm_GU))+
   geom_point(aes(colour= Crop))+
+  scale_color_manual(values = c("Wheat" = "red",
+                                "Barley"="orange",
+                                "Oats"="darkviolet",
+                                "Canola"="blue3",
+                                "Pulse"="lightblue",
+                                "Sorghum"="grey",
+                                "Cotton"="black"
+                                )) +
   geom_boxplot(fill = "white", alpha =0.1)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90,
@@ -149,12 +167,24 @@ df_2016_long <- df_2016 %>% pivot_longer(
   mutate(precenatge_yld_loss_tonnes_per_farm_GU = yld_loss_tonnes_per_farm_GU *100)
 
 
+df_2016_long$Crop <- factor(df_2016_long$Crop, 
+                                                 levels = c("Wheat", "Barley", "Oats", "Canola", "Pulse", "Sorghum"
+                                                             ))
+
+
 
 df_2016_long %>% 
   filter(Region!= "National") %>% 
   filter(Crop != "TOTAL") %>% 
   ggplot(aes(x= `AgEc Zone`, y = precenatge_yld_loss_tonnes_per_farm_GU))+
   geom_point(aes(colour= Crop))+
+  scale_color_manual(values = c("Wheat" = "red",
+                                "Barley"="orange",
+                                "Oats"="darkviolet",
+                                "Canola"="blue3",
+                                "Pulse"="lightblue",
+                                "Sorghum"="grey"                                
+  )) +
   geom_boxplot(fill = "white", alpha =0.1)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90,
@@ -189,9 +219,16 @@ step1_Summary_weed1_2_yld_loss_GU
 str(step1_Summary_weed1_2_yld_loss_GU)
 
 step1_Summary_weed1_2_yld_loss_GU %>% 
- 
   ggplot(aes(x= `AEZ for report`, y = Yld_loss_per_ha_GU ))+
   geom_point(aes(colour= Crop))+
+  scale_color_manual(values = c("Wheat" = "red",
+                                "Barley"="orange",
+                                "Oats"="darkviolet",
+                                "Canola"="blue3",
+                                "Pulse"="lightblue",
+                                "Sorghum"="grey",
+                                "Cotton"="black"                                
+  )) +
   geom_boxplot(fill = "white", alpha =0.1)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90,
@@ -225,12 +262,22 @@ df_2016_yld_t_ha_long <- df_2016_yld_t_ha %>% pivot_longer(
 #   mutate(precenatge_yld_loss_tonnes_per_farm_GU = yld_loss_tonnes_per_farm_GU *100)
 str(df_2016_yld_t_ha_long)
 
+df_2016_yld_t_ha_long$Crop <- factor(df_2016_yld_t_ha_long$Crop, 
+                                                levels = c("Wheat", "Barley", "Oats", "Canola", "Pulse", "Sorghum" ))
+
 
 df_2016_yld_t_ha_long %>%
   filter(Region!= "National") %>% 
   filter(Crop != "TOTAL") %>% 
   ggplot(aes(x= `AgEc Zone`, y = Yld_loss_per_ha_GU ))+
   geom_point(aes(colour= Crop))+
+  scale_color_manual(values = c("Wheat" = "red",
+                                "Barley"="orange",
+                                "Oats"="darkviolet",
+                                "Canola"="blue3",
+                                "Pulse"="lightblue",
+                                "Sorghum"="grey"
+  )) +
   geom_boxplot(fill = "white", alpha =0.1)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90,
@@ -263,6 +310,14 @@ ave_Rev_loss_perHa_all_GU <-Summary_weed1_2_yld_loss_all_GU$Rev_loss_per_ha_AEZ_
 step1_Summary_weed1_2_yld_loss_GU %>% 
   ggplot(aes(x= `AEZ for report`, y =  Rev_loss_per_ha_GU  ))+
   geom_point(aes(colour= Crop))+
+  scale_color_manual(values = c("Wheat" = "red",
+                                "Barley"="orange",
+                                "Oats"="darkviolet",
+                                "Canola"="blue3",
+                                "Pulse"="lightblue",
+                                "Sorghum"="grey",
+                                "Cotton"="black"                                
+  )) +
   geom_boxplot(fill = "white", alpha =0.1)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90,
@@ -295,12 +350,23 @@ df_2016_Rev_t_ha_long <- df_2016_Rev_t_ha %>% pivot_longer(
 
 str(df_2016_Rev_t_ha_long)
 
+df_2016_Rev_t_ha_long$Crop <- factor(df_2016_Rev_t_ha_long$Crop, 
+                                                 levels = c("Wheat", "Barley", "Oats", "Canola", "Pulse", "Sorghum" ))
+
+
 
 df_2016_Rev_t_ha_long %>%
   filter(Region!= "National") %>% 
   filter(Crop != "TOTAL") %>% 
   ggplot(aes(x= `AgEc Zone`, y = Rev_loss_per_ha_GU ))+
   geom_point(aes(colour= Crop))+
+  scale_color_manual(values = c("Wheat" = "red",
+                                "Barley"="orange",
+                                "Oats"="darkviolet",
+                                "Canola"="blue3",
+                                "Pulse"="lightblue",
+                                "Sorghum"="grey"                               
+  )) +
   geom_boxplot(fill = "white", alpha =0.1)+
   theme_bw()+
   theme(axis.text.x = element_text(angle = 90,
