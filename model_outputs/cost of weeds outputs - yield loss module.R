@@ -153,6 +153,15 @@ step1_Summary_weed1_2_yld_loss_GU %>%
   facet_wrap(.~ Region, scales = "free_x")
 
 
+
+ggsave(
+    device = "png",
+    filename = "2024yld_loss_plot_precenatge_yld_loss_tonnes_per_farm.png",
+    path= "W:/Economic impact of weeds round 2/model/plotting and checking results/",
+    width=9.5,
+    height = 6.28,
+    dpi=600
+  )
 ## 2016 results ----
         
 data_source_old_model <- "W:/Economic impact of weeds round 2/model/old model/"
@@ -202,7 +211,14 @@ df_2016_long %>%
              color = "green", size=.5)+
   facet_wrap(.~ Region, scales = "free_x")
 
-
+ggsave(
+  device = "png",
+  filename = "2016_yld_loss_plot_precenatge_yld_loss_tonnes_per_farm.png",
+  path= "W:/Economic impact of weeds round 2/model/plotting and checking results/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)
 
 
 # Plot yield loss per HA of rep farm AEZ by crop type ----
@@ -245,6 +261,16 @@ step1_Summary_weed1_2_yld_loss_GU %>%
     geom_hline(yintercept=0.048, linetype="dashed",
                color = "green", size=.5)+
   facet_wrap(.~ Region, scales = "free_x")
+
+ggsave(
+  device = "png",
+  filename = "2024_Yld_loss_per_ha.png",
+  path= "W:/Economic impact of weeds round 2/model/plotting and checking results/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)
+
 
 
 ## 2016 results ----
@@ -295,7 +321,14 @@ df_2016_yld_t_ha_long %>%
              color = "green", size=.5)+
   facet_wrap(.~ Region, scales = "free_x")
 
-
+ggsave(
+  device = "png",
+  filename = "2016_Yld_loss_per_ha.png",
+  path= "W:/Economic impact of weeds round 2/model/plotting and checking results/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)
 
 
 # Plot revenue loss per HA of rep farm AEZ by crop type ----
@@ -334,6 +367,17 @@ step1_Summary_weed1_2_yld_loss_GU %>%
   geom_hline(yintercept=12.21, linetype="dashed",
              color = "green", size=.5)+
   facet_wrap(.~ Region, scales = "free_x")
+
+
+ggsave(
+  device = "png",
+  filename = "2024_Rev_loss_per_ha.png",
+  path= "W:/Economic impact of weeds round 2/model/plotting and checking results/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)
+
 
 
 ## 2016 results ----
@@ -384,21 +428,16 @@ df_2016_Rev_t_ha_long %>%
              color = "green", size=.5)+
   facet_wrap(.~ Region, scales = "free_x")
 
+ggsave(
+  device = "png",
+  filename = "2016_Rev_loss_per_ha.png",
+  path= "W:/Economic impact of weeds round 2/model/plotting and checking results/",
+  width=9.5,
+  height = 6.28,
+  dpi=600
+)
 
-
-
-### add the gross up values , expressed as % of farms yield, and revenue loss -DONE
-### add the average value from last study and herb loss baseline 2.6% -Done
-### should we be showing yield loss per ha of crop type.
-#eg  for AEZ 6 (SA Midnorth-Lower Yorke Eyre) Barley crop
-## yield loss for AEZ rep farm in ha (weed 1 and 2) / ha of crop for rep farm
-
-### questions to ask...
-#1) why does cotton have the same yield loss? what are the weeds that are driving this? and why is it so high?
-#2) Why is yield loss so high in oats is this related to yield loss coefficient?
-#3) why is SA mid north so high
-
-#4) 
-
-
+ave_perc_yld_loss_all_GU 
+ave_yld_loss_perHa_all_GU
+ave_Rev_loss_perHa_all_GU
 
