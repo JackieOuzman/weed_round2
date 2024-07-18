@@ -48,8 +48,9 @@ all_states_with_data_long_remove_no_data <- all_states_with_data_long_remove_no_
       AEZ == "NSW NW / Qld SW" ~ "Northern",
       AEZ == "Qld Central" ~ "Northern",
       
-      AEZ == "NSW Central" ~ "Southern",
-      AEZ == "NSW Vic Slopes" ~ "Southern",
+      AEZ == "NSW Central" ~ "Northern",
+      AEZ == "NSW Vic Slopes" ~ "Northern",
+      
       AEZ == "SA Mid N Lower YP EP" ~ "Southern",
       AEZ == "SA Vic Mallee" ~ "Southern",
       AEZ == "SA Vic Bordertown Wimmera" ~ "Southern",
@@ -92,8 +93,9 @@ all_states_with_data_long_remove_no_data <- all_states_with_data_long_remove_no_
       AEZ == "NSW NW / Qld SW" ~ "Northern",
       AEZ == "Qld Central" ~ "Northern",
       
-      AEZ == "NSW Central" ~ "Southern",
-      AEZ == "NSW Vic Slopes" ~ "Southern",
+      AEZ == "NSW Central" ~ "Northern",
+      AEZ == "NSW Vic Slopes" ~ "Northern",
+      
       AEZ == "SA Mid N Lower YP EP" ~ "Southern",
       AEZ == "SA Vic Mallee" ~ "Southern",
       AEZ == "SA Vic Bordertown Wimmera" ~ "Southern",
