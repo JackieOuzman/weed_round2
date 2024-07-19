@@ -53,7 +53,7 @@ unique(SA_sites$weed_density)
 
 SA_sites <- SA_sites %>% 
   filter(weed_type == "winter_dicot") %>% 
-  filter(soil == "Clay" ) %>% # I tried with other soils
+  filter(soil == "PaleSand" ) %>% # I tried with other soils Clay ClayLoam Duplex Loam PaleSan
   filter(initial_water == 20 ) %>% 
   filter(weed_sow_date == "01-Jan" )
   
@@ -96,4 +96,4 @@ SA_yld_coef <- SA_yld_coef %>%
 
 SA_yld_coef_kill_40 <- SA_yld_coef %>% filter(weed_kill == 40)
 
-write.csv(SA_yld_coef_kill_40 , "W:/Economic impact of weeds round 2/fallow_weeds_yld_loss/yld_loss_coef_SA_clay_inital_water20_sow_1stJan_kill_40days.csv" )
+write.csv(SA_yld_coef_kill_40 , "W:/Economic impact of weeds round 2/fallow_weeds_yld_loss/yld_loss_coef_SA_PaleSand_inital_water20_sow_1stJan_kill_40days.csv" )
