@@ -26,6 +26,7 @@ Condobolin <- read.csv(paste0(input_path, "Condobolin_top_upextra_Clm_step2.csv"
 Cootamundra <- read.csv(paste0(input_path, "Cootamundra_top_upextra_Clm_step2.csv"))
 Merriwagga <- read.csv(paste0(input_path, "Merriwagga_top_upextra_Clm_step2.csv"))
 
+Temora <- read.csv(paste0(input_path, "Temora_top_upextra_Clm_step2.csv"))
 
 
 ################################################################################
@@ -34,9 +35,9 @@ Condobolin <- Condobolin %>% mutate(site = "Condobolin")
 Cootamundra <- Cootamundra %>% mutate(site = "Cootamundra")
 Merriwagga <- Merriwagga %>% mutate(site = "Merriwagga")
 
+Temora <- Merriwagga %>% mutate(site = "Temora")
 
-
-NSW_sites <- rbind(Condobolin, Cootamundra, Merriwagga )
+NSW_sites <- rbind(Condobolin, Cootamundra, Merriwagga, Temora )
 #rm()
 
 ###############################################################################
