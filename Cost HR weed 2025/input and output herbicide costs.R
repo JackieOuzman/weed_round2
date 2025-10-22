@@ -124,7 +124,9 @@ herbicide_wide_fallow <- herbicide_wide_fallow %>%
   select(AEZ, herbicide_type,Baseline, ScenarioB , pct_change)
 herbicide_wide_fallow
 
-##############################################################################
+###############################################################################
+###  Knockdown input costs  ######################################################
+###############################################################################
 Kockdown_herb_cost <- herbicide_input_costs %>%   filter(herbicide_type == "Knockdown")
 Kockdown_herb_cost %>% distinct(variable_plot)
 
@@ -169,25 +171,91 @@ herbicide_wide_knockdown
 
 
 
+###############################################################################
+###  Pre-emergent input costs  ######################################################
+###############################################################################
+Pre_emergent <- herbicide_input_costs %>%   filter(herbicide_type == "Pre-emergent")
 
 
+Pre_emergent %>% distinct(variable_plot)
+
+Pre_herb_cost_plot <- Pre_emergent %>% 
+  #filter(!AEZ %in% c("Northern","Southern","Western", "Total")) %>% 
+  filter(AEZ %in% c("Northern","Southern","Western", "Total")) %>% 
+  ggplot(aes(x = AEZ, y = value, fill = scenario)) + 
+  geom_col(position = "dodge") +
+  facet_wrap(.~variable_plot, labeller = label_wrap_gen(width = 25)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Input herbicide cost (Chemical only $/ha)",
+    #subtitle = "",
+    x = "AEZ / Region",
+    y = "$ per ha"#,
+    #caption = ""
+  )
+Pre_herb_cost_plot
 
 
+##############################################################################
+##1. how much have the costs decreased?
 
 
-
-pre_emergent_herb_cost_plot <- herbicide_input_costs_national_region %>% 
+herbicide_wide_pre <- Pre_emergent %>% 
   filter(herbicide_type == "Pre-emergent") %>% 
-  ggplot(aes(x = AEZ, y = value, fill = scenario)) + 
-  geom_col(position = "dodge") +
-  facet_wrap(.~variable_plot, labeller = label_wrap_gen(width = 25)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-pre_emergent_herb_cost_plot
+  pivot_wider(
+    names_from = scenario,
+    values_from = value
+  )
 
-post_emergent_herb_cost_plot <- herbicide_input_costs_national_region %>% 
-  filter(herbicide_type == "Post-emergent") %>% 
-  ggplot(aes(x = AEZ, y = value, fill = scenario)) + 
-  geom_col(position = "dodge") +
-  facet_wrap(.~variable_plot, labeller = label_wrap_gen(width = 25)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-post_emergent_herb_cost_plot
+herbicide_wide_pre
+
+herbicide_wide_pre <- herbicide_wide_pre %>%
+  mutate(pct_change = (ScenarioB - Baseline) / Baseline * 100) %>% 
+  select(AEZ, variable_plot,herbicide_type,Baseline, ScenarioB , pct_change)# %>% 
+  #filter( variable_plot %in% c(" Knockdown Cereal In model", " Knockdown Broadleaf In model"))
+  herbicide_wide_pre 
+
+
+
+  ###############################################################################
+  ###  Post-emergent input costs  ######################################################
+  ###############################################################################
+  Post_emergent <- herbicide_input_costs %>%   filter(herbicide_type == "Post-emergent")
+  
+  
+  Post_emergent %>% distinct(variable_plot)
+  
+  Post_emergent_plot <- Post_emergent %>% 
+    #filter(!AEZ %in% c("Northern","Southern","Western", "Total")) %>% 
+    filter(AEZ %in% c("Northern","Southern","Western", "Total")) %>% 
+    ggplot(aes(x = AEZ, y = value, fill = scenario)) + 
+    geom_col(position = "dodge") +
+    facet_wrap(.~variable_plot, labeller = label_wrap_gen(width = 25)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = "Input herbicide cost (Chemical only $/ha)",
+      #subtitle = "",
+      x = "AEZ / Region",
+      y = "$ per ha"#,
+      #caption = ""
+    )
+  Post_emergent_plot
+  
+  
+  ##############################################################################
+  ##1. how much have the costs decreased?
+  herbicide_wide_post <- Post_emergent %>% 
+    filter(herbicide_type == "Post-emergent") %>% 
+    pivot_wider(
+      names_from = scenario,
+      values_from = value
+    )
+  
+  herbicide_wide_post
+  
+  herbicide_wide_post <- herbicide_wide_post %>%
+    mutate(pct_change = (ScenarioB - Baseline) / Baseline * 100) %>% 
+    select(AEZ, variable_plot,herbicide_type,Baseline, ScenarioB , pct_change)# %>% 
+  #filter( variable_plot %in% c(" Knockdown Cereal In model", " Knockdown Broadleaf In model"))
+  herbicide_wide_post 
+  
