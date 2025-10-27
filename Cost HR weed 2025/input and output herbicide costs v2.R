@@ -269,3 +269,9 @@ herbicide_wide_pre <- herbicide_wide_pre %>%
   write_csv(herbicide_wide_post, paste0(  folder_path, "/", "Scenario B/","check inputs/",
                                                "ScB_herbicide_wide_post.csv"))
   
+  
+  
+  
+  
+###############################################################################
+  ### OUTPUT HERB COSTS - just use the excel sheet with the pre populated tables 
