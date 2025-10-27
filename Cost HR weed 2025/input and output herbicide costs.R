@@ -124,6 +124,10 @@ herbicide_wide_fallow <- herbicide_wide_fallow %>%
   select(AEZ, herbicide_type,Baseline, ScenarioB , pct_change)
 herbicide_wide_fallow
 
+### Tas is very high what are the averages without Tas
+
+
+
 ###############################################################################
 ###  Knockdown input costs  ######################################################
 ###############################################################################
